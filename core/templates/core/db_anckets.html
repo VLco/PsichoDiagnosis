@@ -1,0 +1,129 @@
+{% extends 'core/main.html' %}
+
+
+{% block title %}Add a new survey{% endblock %}
+
+
+
+{% block content %}
+
+
+<form action="{% url 'job_with_db_anckets' %}" method="POST">
+
+    {% csrf_token %}
+
+    <div class="col-sm-12" style="position: absolute; top: 25%">
+        <div class="row justify-content-center">
+            <div class="col-7 text-center" style="background-color: white; box-shadow: 0 0 10px;">
+                <div class="col-15 text-center" style="background-color: aquamarine; box-shadow: 0 0 10px;">
+                    <span class="navbar-text" style="color: black">
+                        Number card: 
+                        {{ form.number_card }}
+                    </span>
+                    <h3>
+                        Add a new survey (new form)
+                    </h3>
+                    <div class="form-group row">
+                        <button type="submit" class="mb-3 btn btn-primary" name="add_opros" style='margin-left: 45%;'>Add</button>
+                    </div>
+                </div>
+
+                <div class="col-15 text-center" style="background-color: linen; box-shadow: 0 0 10px;">
+                    <h3>
+                        Add answer
+                    </h3>
+                    <div class="mt-3 form-group row">
+                        <label for="" class="col-sm-2 col-form-label" style="text-align: left;">Id form</label>
+                        <div class="col-sm-10">
+                            {{ form.number_ancket }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-sm-2 col-form-label" style="text-align: left">Question</label>
+                        <div class="col-sm-10">
+                            {{ form.question }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-sm-2 col-form-label" style="text-align: left">Answer</label>
+                        <div class="col-sm-10">
+                            {{ form.answer }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="" class="col-sm-2 col-form-label" style="text-align: left">Conviction</label>
+                        <div class="col-sm-10">
+                            {{ form.conviction }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <button type="submit" class="mb-3 btn btn-primary" name="add_answer" style='margin-left: 45%;'>Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 col-sm-12" style="position: absolute; top: 105%">
+            <div class="row justify-content-center">
+                <div class="col-11 text-center" style="background-color: white; box-shadow: 0 0 10px;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Number card</th>
+                                <th scope="col">First last and middle name of patient</th>
+                                <th scope="col">Id form</th>
+                                <th scope="col">Date create form</th>
+                                <th scope="col">Question</th>
+                                <th scope="col">Answer</th>
+                                <th scope="col">Conviction %</th>
+        
+                            </tr>
+                        </thead>
+        
+        
+                        <tbody>
+                            {% if ankets|length > 0 %}
+                                {% for ancket in ankets  %}
+                                <tr>
+                                    <td>{{ ancket.patient.number_card }}</td>
+                                    <td>{{ ancket.patient.FIO }}</td>
+                                    <td>{{ ancket.id }}</td>
+                                    <td>{{ ancket.date }}</td>
+                                    <td>*</td>
+                                    <td>*</td>
+                                    <td>*</td>
+                                </tr>
+                                    {% for answer in answers %}
+                                        {% ifequal answer.ancket.id ancket.id %}
+                                        <tr>
+                                            <td>{{ ancket.patient.number_card }}</td>
+                                            <td>{{ ancket.patient.FIO }}</td>
+                                            <td>{{ ancket.id }}</td>
+                                            <td>{{ ancket.date }}</td>
+                                            <td>{{ answer.question.question }}</td>
+                                            <td>{{ answer.note }}</td>
+                                            <td>{{ answer.conviction }}</td>
+                                        </tr>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                {% endfor %}
+                            {% endif %}
+        
+                        </tbody>
+        
+        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</form>
+
+
+
+
+
+
+    {% endblock %}
