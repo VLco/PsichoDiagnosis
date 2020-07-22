@@ -180,12 +180,16 @@ class DBEpicrizForm(forms.Form):
 
 
 class DiagnosesForm(forms.Form):
+    idRowDiag = forms.IntegerField(required='', label="")
+    idDiag = forms.IntegerField(required='', label="")
     nameDiag = forms.CharField(required='', max_length=1000, label="name diagnos")
     descriptionDiag = forms.CharField(required='',max_length=5000, widget=forms.Textarea, label="description diagnos")
     nameDiag.widget.attrs.update({'class': 'form-control'})
     descriptionDiag.widget.attrs.update({'class': 'form-control'})
 
 class SymptomesForm(forms.Form):
+    idRowSym= forms.IntegerField(required='', label="")
+    idSym = forms.IntegerField(required='', label="")
     nameSym = forms.CharField(required='', max_length=1000, label="name symptom")
     descriptionSym = forms.CharField(required='',max_length=5000, widget=forms.Textarea, label="description symptom")
     nameSym.widget.attrs.update({'class': 'form-control'})

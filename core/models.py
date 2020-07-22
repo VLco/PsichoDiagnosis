@@ -101,16 +101,23 @@ class Form(models.Model):
 
 class Conviction(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')
-    Min = models.FloatField()
-    Max = models.FloatField()
+    Position = models.IntegerField()
 
     class Meta():
         verbose_name = 'conviction'
         verbose_name_plural = 'convictions'
 
+class Frequency(models.Model):
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    Coef = models.FloatField()
+
+    class Meta():
+        verbose_name = 'frequency'
+        verbose_name_plural = 'frequency'
+
 class Rule(models.Model):
     Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
-    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+    Frequency = models.ForeignKey(Frequency, on_delete=models.CASCADE)
 
     class Meta():
         verbose_name = 'rule'
