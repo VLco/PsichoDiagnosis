@@ -25,13 +25,17 @@ urlpatterns = [
     path('doctor-<login>/db-symptoms/', views.db_symptoms, name="db_symptoms"),
     path('job-with-db-symptoms/', views.job_with_db_symptoms, name="job_with_db_symptoms"),
     
-    path('directory/', views.directory, name="directory"),
+    path('<login>-directory/', views.directory, name="directory"),
     path('diagnos/delete/', views.delete_diagnos, name="delete_diagnos"),
     path('diagnos/add/', views.add_diagnos, name="add_diagnos"),
     path('symptom/delete/', views.delete_symptom, name="delete_symptom"),
     path('symptom/add/', views.add_symptom, name="add_symptom"),
 
+    path('<login>-patient_records/',views.patient_records, name="patient_records"),
+    path('patient_records/add/', views.add_patient_records, name="add_patient_records"),
+    path('patient_records/delete/', views.delete_patient_records, name="delete_patient_records"),
 
+    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet")
 
 
 

@@ -47,12 +47,14 @@ from .forms import DBEpicrizForm
 
 from .forms import DiagnosesForm
 from .forms import SymptomesForm
+from .forms import PatientsForm
+from .forms import UserForm
 
 
 # Create your views here.
 
 g_login = ''
-
+g_id = ''
 # ok
 def base_core(request):
     signin_form = SigninForm()
@@ -92,7 +94,7 @@ def sign_in(request):
 def register(request):
     if request.method == "POST":
         user = Doctor()
-
+        
         fields = {
             'login': request.POST.get("login"),
             'password': request.POST.get("password"),
@@ -146,17 +148,17 @@ def main(request):
 
 
 # ok
-def db_patients(request, login):
+def db_patients(request, id):
 
-    global g_login
-    g_login = login
+    global g_id
+    g_id = id
 
     db_patients_form = DbPatientsForm()
 
     patients = PatientRecord.objects.all()
 
     context = {
-        'login': login,
+        'login': id,
         'form': db_patients_form,
         'patients': patients,
     }
@@ -957,7 +959,11 @@ def job_with_db_symptoms(request):
 
 
 
-def directory(request):
+
+
+
+def directory(request, login):
+
     ruleSymptomes = RuleSymptom.objects.all()
     symptomes = Symptom.objects.all()
     diagnoses = Diagnos.objects.all()
@@ -966,6 +972,7 @@ def directory(request):
     formSymptom = SymptomesForm()
 
     context = {
+        'login':login,
         'formDiagnos': formDiagnos,
         'formSymptom': formSymptom,
         'ruleSymptomes': ruleSymptomes,
@@ -975,6 +982,7 @@ def directory(request):
     template = "core/directory.html"
     return render(request, template, context)
 
+
 def delete_diagnos(request):
     error=1
     if request.method == "POST":
@@ -983,6 +991,7 @@ def delete_diagnos(request):
             Diagnos.objects.all().filter(id=id).delete()
             error=0
     return HttpResponse(error)
+
 
 def add_diagnos(request):
     error=-1
@@ -999,6 +1008,7 @@ def add_diagnos(request):
             error=-2
     return HttpResponse(error)
 
+
 def delete_symptom(request):
     error=1
     if request.method == "POST":
@@ -1007,6 +1017,7 @@ def delete_symptom(request):
             Symptom.objects.all().filter(id=id).delete()
             error=0
     return HttpResponse(error)
+
 
 def add_symptom(request):
     error=-1
@@ -1022,6 +1033,75 @@ def add_symptom(request):
         else:
             error=-2
     return HttpResponse(error)
+
+
+def patient_records(request,login):
+    records = PatientRecord.objects.all()
+    global g_login
+    g_login = login
+
+    formRecords = PatientsForm()
+    context = {
+        'login':login,
+        'formRecords':formRecords,
+        'records':records
+    }
+    template = "core/patient_record.html"
+    return render(request, template, context)
+
+
+def delete_patient_records(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if PatientRecord.objects.all().filter(id=id):
+            PatientRecord.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+
+def add_patient_records(request):
+    error=-1
+
+    if request.method == "POST":
+        number_card = request.POST.get("number_card")
+        FIO = request.POST.get("FIO")
+        date_birth = request.POST.get("date_birth")
+        address = request.POST.get("address")
+        phone = request.POST.get("phone")
+        sex = request.POST.get("sex")
+        if not (PatientRecord.objects.all().filter(NumberRecord=number_card) or number_card==''):
+            patient = PatientRecord()
+            patient.NumberRecord = number_card
+            patient.FIO = FIO
+            patient.Birthday = date_birth
+            patient.Adress = address
+            patient.Phone = phone
+            patient.Sex = sex
+            patient.save()
+            error=patient.id
+        else:
+            error=-2
+    return HttpResponse(error)
+
+
+def personal_cabinet(request, login):
+    global g_login
+    g_login = login
+
+    formUser = UserForm()
+    user = Doctor.objects.get(login = g_login)
+    context = {
+        'login':login,
+        'formUser':formUser,
+        'user': user
+    }
+    template = "core/personal_cabinet.html"
+    return render(request, template, context)
+
+
+
+
 
 
 

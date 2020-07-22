@@ -190,3 +190,33 @@ class SymptomesForm(forms.Form):
     descriptionSym = forms.CharField(required='',max_length=5000, widget=forms.Textarea, label="description symptom")
     nameSym.widget.attrs.update({'class': 'form-control'})
     descriptionSym.widget.attrs.update({'class': 'form-control'})
+
+class PatientsForm(forms.Form):
+    number_card = forms.CharField(required='', max_length=50, label="number card")
+    FIO = forms.CharField(required='', max_length=100, label="First last middle name")
+    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: DD.MM.YYYY'}))
+    sex = forms.CharField(required='', max_length=50, label="sex")
+    address = forms.CharField(required='', max_length=100, label="adress")
+    phone = forms.CharField(required='', max_length=50, label="phons")
+
+    number_card.widget.attrs.update({'class': 'form-control'})
+    FIO.widget.attrs.update({'class': 'form-control'})
+    date_birth.widget.attrs.update({'class': 'form-control'})
+    sex.widget.attrs.update({'class': 'form-control'})
+    address.widget.attrs.update({'class': 'form-control'})
+    phone.widget.attrs.update({'class': 'form-control'})
+
+class UserForm(forms.Form):
+    FIO = forms.CharField(required='', max_length=50, label="FIO")
+    email = forms.CharField(required='', max_length=100, label="email")
+    password = forms.CharField(required='', max_length=100, label="password")
+    social_networks = forms.CharField(required='', max_length=100, label="social_networks")
+    position = forms.CharField(required='', max_length=100, label="position")
+    department = forms.CharField(required='', max_length=100, label="position")
+
+    FIO.widget.attrs.update({'class': 'form-control'})
+    email.widget.attrs.update({'class': 'form-control'})
+    password.widget.attrs.update({'class': 'form-control'})
+    social_networks.widget.attrs.update({'class': 'form-control'})
+    position.widget.attrs.update({'class': 'form-control'})
+    department.widget.attrs.update({'class': 'form-control'})

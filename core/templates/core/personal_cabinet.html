@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %} {% block content %}
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+        <div class="container">
+            <h1 class="jumbotron-heading">Patient records</h1>
+            <p class="lead">On this page you can work with patient data</p>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+
+
+    <p class="text-justify">Email:{{user.email}}</p>
+    <br>
+    <p class="text-justify">FIO:{{user.FIO}}</p>
+    <br>
+    <p class="text-justify">Password:{{user.password}}</p>
+    <br>
+    <p class="text-justify">Social Networks:{{user.SocialNetworks}}</p>
+    <br>
+    <p class="text-justify">Position:{{user.Position}}</p>
+    <br>
+    <p class="text-justify">Department:{{user.Department}}</p>
+
+
+
+</div>
+
+<style>
+    p {
+        color: aliceblue;
+    }
+</style>
+{% endblock %}
