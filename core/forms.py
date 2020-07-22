@@ -212,7 +212,7 @@ class UserForm(forms.Form):
     password = forms.CharField(required='', max_length=100, label="password")
     social_networks = forms.CharField(required='', max_length=100, label="social_networks")
     position = forms.CharField(required='', max_length=100, label="position")
-    department = forms.CharField(required='', max_length=100, label="position")
+    department = forms.CharField(required='', max_length=100, label="department")
 
     FIO.widget.attrs.update({'class': 'form-control'})
     email.widget.attrs.update({'class': 'form-control'})

@@ -35,7 +35,8 @@ urlpatterns = [
     path('patient_records/add/', views.add_patient_records, name="add_patient_records"),
     path('patient_records/delete/', views.delete_patient_records, name="delete_patient_records"),
 
-    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet")
+    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
+
 
 
 

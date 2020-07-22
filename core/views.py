@@ -1086,22 +1086,44 @@ def add_patient_records(request):
 
 
 def personal_cabinet(request, login):
-    global g_login
-    g_login = login
+    if not request.method == "POST":
+        global g_login
+        g_login = login
 
-    formUser = UserForm()
-    user = Doctor.objects.get(login = g_login)
-    context = {
-        'login':login,
-        'formUser':formUser,
-        'user': user
-    }
-    template = "core/personal_cabinet.html"
-    return render(request, template, context)
+        formUser = UserForm()
+        user = Doctor.objects.get(login = g_login)
+        context = {
+            'login':login,
+            'formUser':formUser,
+            'user': user
+        }
+        template = "core/personal_cabinet.html"
+        return render(request, template, context)
 
+    if request.method == "POST":
+        formUser = UserForm()
+        user = Doctor.objects.get(login = login)
+        user.FIO = request.POST.get("FIO")
+        user.email = request.POST.get("email")
+        user.password = request.POST.get("password")
+        user.SocialNetwork = request.POST.get("social_networks")
+        user.Postion = request.POST.get("position")
+        user.Department = request.POST.get("department")
+        user.save()
 
+        formUser.fields['FIO'].initial = user.FIO
+        formUser.fields['email'].initial = user.email
+        formUser.fields['password'].initial = user.password
+        formUser.fields['social_networks'].initial = user.SocialNetwork
+        formUser.fields['position'].initial = user.Postion
+        formUser.fields['department'].initial = user.Department
 
-
-
+        template = "core/personal_cabinet.html"
+        context = {
+            'login': login,
+            'form': formUser,
+            'user': user
+            }
+        return render(request, template, context)
 
 
