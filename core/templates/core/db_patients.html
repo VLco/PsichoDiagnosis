@@ -62,18 +62,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Nationality</label>
-                    <div class="col-sm-10">
-                        {{ form.nationality }}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Education</label>
-                    <div class="col-sm-10">
-                        {{ form.education }}
-                    </div>
-                </div>
-                <div class="form-group row">
                     <label for="" class="col-sm-2 col-form-label" style="text-align: left">Address</label>
                     <div class="col-sm-10">
                         {{ form.address }}
@@ -83,18 +71,6 @@
                     <label for="" class="col-sm-2 col-form-label" style="text-align: left">Phone</label>
                     <div class="col-sm-10">
                         {{ form.phone }}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Place of work</label>
-                    <div class="col-sm-10">
-                        {{ form.job }}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Position</label>
-                    <div class="col-sm-10">
-                        {{ form.position }}
                     </div>
                 </div>
             </div>
@@ -110,12 +86,8 @@
                                 <th scope="col">First name, last name and middle name</th>
                                 <th scope="col">Birthday</th>
                                 <th scope="col">Sex</th>
-                                <th scope="col">Nationality</th>
-                                <th scope="col">Education</th>
                                 <th scope="col">Address</th>
                                 <th scope="col">Phone</th>
-                                <th scope="col">Place of work</th>
-                                <th scope="col">Position</th>
         
                             </tr>
                         </thead>
@@ -126,16 +98,12 @@
                             {% for patient in patients %}
         
                             <tr>
-                                <td>{{ patient.number_card }}</td>
+                                <td>{{ patient.NumberRecord }}</td>
                                 <td>{{ patient.FIO }}</td>
-                                <td>{{ patient.date_birth }}</td>
-                                <td>{{ patient.sex }}</td>
-                                <td>{{ patient.nationality }}</td>
-                                <td>{{ patient.education }}</td>
-                                <td>{{ patient.address }}</td>
-                                <td>{{ patient.phone }}</td>
-                                <td>{{ patient.job }}</td>
-                                <td>{{ patient.position }}</td>
+                                <td>{{ patient.Birthday }}</td>
+                                <td>{{ patient.Sex }}</td>
+                                <td>{{ patient.Adress }}</td>
+                                <td>{{ patient.Phone }}</td>
                             </tr>
         
                             {% endfor %}

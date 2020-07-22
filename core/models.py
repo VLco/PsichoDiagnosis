@@ -1,141 +1,157 @@
 from django.db import models
 
-# Create your models here.
+
+class PatientRecord(models.Model):
+    NumberRecord = models.CharField(max_length=200, verbose_name='number record')
+    FIO = models.CharField(max_length=200, verbose_name='FIO')
+    Birthday = models.DateField(default = "1999-01-01", null=True)
+    Sex = models.CharField(max_length=200, verbose_name='sex')
+    Adress = models.CharField(max_length=200, verbose_name='adress')
+    Phone = models.CharField(max_length=50, verbose_name='phone')
+
+    class Meta():
+        verbose_name = 'patient'
+        verbose_name_plural = 'patients'
 
 
-
-
-
-class User(models.Model):
+class Doctor(models.Model):
+    Patient = models.ManyToManyField(PatientRecord, through='PatientList')
     login = models.CharField(max_length=200, verbose_name='login')
-    password = models.CharField(max_length = 50, verbose_name='password')
-    isAdmin = models.BooleanField(verbose_name='is admin') # Не нужно, но пусть будет чтобы ошибок не было.
-    FIO = models.CharField(max_length = 50, verbose_name='last first middle name', default="")
-    Postion = models.CharField(max_length = 50, verbose_name='position', default="")
-    Department = models.CharField(max_length = 50, verbose_name='department', default="")
+    email = models.CharField(max_length=200, verbose_name='email')
+    password = models.CharField(max_length=50, verbose_name='password')
+    FIO = models.CharField(max_length=50, verbose_name='last first middle name', default="")
+    SocialNetwork = models.CharField(max_length=50, verbose_name='SocialNetwork', default="")
+    Postion = models.CharField(max_length=50, verbose_name='position', default="")
+    Department = models.CharField(max_length=50, verbose_name='department', default="")
 
     def __str__(self):
         return self.login
 
+    class Meta():
+        verbose_name = 'doctor'
+        verbose_name_plural = 'doctors'
+
+
+
+
+
+class PatientList(models.Model):
+    Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    PatientRecord = models.ForeignKey(PatientRecord, on_delete=models.CASCADE)
+
+
+class Treatment(models.Model):
+    Record = models.ForeignKey(PatientRecord, on_delete=models.CASCADE)
+    Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=200, verbose_name='name')
+    Note = models.CharField(max_length=5000, verbose_name='note')
 
     class Meta():
-        verbose_name = 'user'
-        verbose_name_plural='users'
+        verbose_name = 'treatment'
+        verbose_name_plural = 'treatments'
 
 
-
-
-class Patient(models.Model):
-    number_card = models.IntegerField(verbose_name="card")
-    FIO = models.CharField(max_length=100, verbose_name="last first middle name")
-    date_birth = models.CharField(max_length=100, verbose_name="birthday")
-    sex = models.CharField(max_length=50, verbose_name="sex")
-    nationality = models.CharField(max_length=50, verbose_name="nationality")
-    education = models.CharField(max_length=100, verbose_name="education")
-    address = models.CharField(max_length=100, verbose_name="adress")
-    phone = models.CharField(max_length=50, verbose_name="phone")
-    job = models.CharField(max_length=100, verbose_name="place work")
-    position = models.CharField(max_length=100, verbose_name="position")
-
-
-    def __str__(self):
-        return self.number_card
-
+class Epicrisis(models.Model):
+    Treatment = models.OneToOneField(Treatment,on_delete=models.CASCADE)
+    Referral = models.CharField(max_length=1000, verbose_name='referral')
+    Therapy = models.CharField(max_length=50000, verbose_name='therapy')
+    Disability = models.CharField(max_length=1000, verbose_name='disability')
+    Hospitalization = models.DateField(default = "1999-01-01", null=True)
+    HospitalDischarge = models.DateField(default="1999-01-01", null=True)
+    IsOver = models.IntegerField()
 
     class Meta():
-        verbose_name = 'patient'
-        verbose_name_plural='patients'
+        verbose_name = 'epicrisis'
+        verbose_name_plural = 'epicrises'
 
-# Сущность анкета пациента
-class Ancket(models.Model):
-    date = models.CharField(max_length=100, verbose_name="date form")
-    patient = models.ForeignKey(Patient, on_delete = models.CASCADE, verbose_name="patient")
 
-    def __str__(self):
-        return self.date
+class Diagnosis(models.Model):
+    Treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
+    Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    StartDiagnosis = models.DateField(default = "1999-01-01", null=True)
+    Note = models.CharField(max_length=50000, verbose_name='note')
 
+    class Meta():
+        verbose_name = 'diagnosis'
+        verbose_name_plural = 'diagnostics'
+
+
+class Diagnos(models.Model):
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    Description = models.CharField(max_length=50000, verbose_name='description')
+
+    class Meta():
+        verbose_name = 'diagnos'
+        verbose_name_plural = 'diagnoses'
+
+
+class Form(models.Model):
+    Diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    DateForm = models.DateField(default = "1999-01-01", null=True)
+    Note = models.CharField(max_length=50000, verbose_name='note')
+    Conviction = models.IntegerField()
 
     class Meta():
         verbose_name = 'form'
-        verbose_name_plural='forms'
+        verbose_name_plural = 'forms'
 
-# Вопросы
-class Question(models.Model):
-    question = models.CharField(max_length=100, verbose_name="question")
 
-    def __str__(self):
-        return self.question
-
+class Conviction(models.Model):
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    Min = models.FloatField()
+    Max = models.FloatField()
 
     class Meta():
-        verbose_name = 'question'
-        verbose_name_plural='qestions'
+        verbose_name = 'conviction'
+        verbose_name_plural = 'convictions'
 
-# ответы
-class Answer(models.Model):
-    date = models.DateField()
-    note = models.TextField()
-    conviction = models.IntegerField(default=0)
-    ancket = models.ForeignKey(Ancket, on_delete = models.CASCADE)
-    question = models.ForeignKey(Question, on_delete = models.CASCADE)
-    
-
-    def __str__(self):
-        return self.note
-
-
-
-
-# Болезни(диагнозы)
-class Disease(models.Model):
-    name = models.CharField(max_length=100, verbose_name="name")
-    note = models.TextField() #описание
-
-    def __str__(self):
-        return self.name
-
-
-
-# Эпикризы
-class Epicriz(models.Model):
-    patient = models.ForeignKey(Patient, on_delete = models.CASCADE)
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    invalid = models.BooleanField(default = False)
-    lechenie = models.CharField(max_length=500, default="", verbose_name="lechenie", null=True)
-    date_gospit = models.DateField(default = "1999-01-01" , null=True)
-    date_vipisky = models.DateField(default = "1999-01-01", null=True)
-
-    def __str__(self):
-        return self.lechenie
-
-
-####################################
-
-# Диагнозы пациента
-class Diagnos(models.Model):
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
-    epicriz = models.ForeignKey(Epicriz, on_delete = models.CASCADE)
-    disease = models.ForeignKey(Disease, on_delete = models.CASCADE)
-    note = models.TextField()
-
-    def __str__(self):
-        return self.note
-
-# правила
 class Rule(models.Model):
-    # diagnos = models.ForeignKey(Diagnos, on_delete = models.CASCADE)
-    disease = models.ForeignKey(Disease, on_delete = models.CASCADE)
-    conviction = models.IntegerField(default=0) 
+    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.conviction
+    class Meta():
+        verbose_name = 'rule'
+        verbose_name_plural = 'rules'
+
+class Symptom(models.Model):
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    Description = models.CharField(max_length=50000, verbose_name='description')
+
+    class Meta():
+        verbose_name = 'symptom'
+        verbose_name_plural = 'symptoms'
+
+class RuleSymptom(models.Model):
+    Rule = models.OneToOneField(Rule, on_delete=models.CASCADE)
+    Symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+
+    class Meta():
+        verbose_name = 'rule symptom'
+        verbose_name_plural = 'rules symptom'
 
 
-class PravilaRule(models.Model):
-    question = models.ForeignKey(Question, on_delete = models.CASCADE)
-    # conviction = models.IntegerField(default=0) 
-    rule = models.ForeignKey(Rule, on_delete = models.CASCADE)
 
 
-    def __str__(self):
-        return self.question
+class SelectedSymptoms(models.Model):
+    Form = models.ForeignKey(Form, on_delete=models.CASCADE)
+    Symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+    Note = models.CharField(max_length=50000, verbose_name='note')
+
+    class Meta():
+        verbose_name = 'selected symptom'
+        verbose_name_plural = 'selected symptoms'
+
+class Anamesis(models.Model):
+    Treatment = models.OneToOneField(Treatment, on_delete=models.CASCADE)
+    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
+
+    class Meta():
+        verbose_name = 'Anamesis'
+        verbose_name_plural = 'Anamesises'
+
+

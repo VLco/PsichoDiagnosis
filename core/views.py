@@ -11,66 +11,70 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
-
-from .models import User
-#from .models import Doctor
-from .models import Patient
-from .models import Ancket
-from .models import Question
-from .models import Disease
-from .models import Answer
-from .models import Epicriz
+from .models import PatientRecord
+from .models import Doctor
+from .models import PatientList
+from .models import Treatment
+from .models import Epicrisis
+from .models import Diagnosis
 from .models import Diagnos
+from .models import Form
+from .models import Conviction
 from .models import Rule
-from .models import PravilaRule
+from .models import Symptom
+from .models import RuleSymptom
+from .models import SelectedSymptoms
+from .models import Anamesis
+
 
 
 
 from .forms import SigninForm
 from .forms import RegisterForm
 from .forms import DbPatientsForm
-from .forms import DBAncketsForm
+# from .forms import DBAncketsForm
 from .forms import DbQuestionsForm
 from .forms import DbDiseasesForm
 from .forms import PostuplenieForm
 from .forms import ProfileForm
 from .forms import DBEpicrizForm
-from .forms import DbDiagnosesForm
-from .forms import WorkWithRulesForm
-from .forms import DBSymptomsForm
+# from .forms import DbDiagnosesForm
+# from .forms import WorkWithRulesForm
+# from .forms import DBSymptomsForm
+
+from .forms import DiagnosesForm
+from .forms import SymptomesForm
+
 
 # Create your views here.
 
 g_login = ''
 
+# ok
 def base_core(request):
     signin_form = SigninForm()
     template = "core/base_core.html"
     return render(request, template, {"form": signin_form})
 
 
-
-
+# ok
 def sign_in(request):
     if request.method == "POST":
-        user = User()
+        user = Doctor()
 
         fields = {
             'login': request.POST.get("login"),
             'password': request.POST.get("password"),
         }
 
-        if User.objects.all().filter(login=fields['login']):
+        if Doctor.objects.all().filter(login=fields['login']):
             user.login = fields['login']
             user.password = fields['password']
-            #user.save()
-            #return HttpResponseRedirect('/main')
             template = 'core/main.html'
             return render(request, template, {"login": user.login})
-            #return HttpResponseRedirect(reverse("main", kwargs={'login': user.login}))
-
         else:
             signin_form = SigninForm()
             template = "core/base_core.html"
@@ -84,10 +88,10 @@ def sign_in(request):
 
 
 
-
+# ok
 def register(request):
     if request.method == "POST":
-        user = User()
+        user = Doctor()
 
         fields = {
             'login': request.POST.get("login"),
@@ -95,7 +99,7 @@ def register(request):
             'rePassword': request.POST.get("rePassword")
         }
 
-        if User.objects.all().filter(login=fields['login']):
+        if Doctor.objects.all().filter(login=fields['login']):
             reg_form = RegisterForm()
             template = "core/register.html"
             return render(request, template, {"form": reg_form, "message":"Пользователь с таким логином уже зарегистрирован"})
@@ -118,21 +122,17 @@ def register(request):
 
 
 
+# ok
 def main(request):
     
     if request.method == "POST":
-        user = User()
 
         fields = {
             'login': request.POST.get("login"),
             'password': request.POST.get("password"),
-            # возвращает 'none' или 'on'
-            'isAdmin': request.POST.get("isAdmin"),
         }
 
-        if User.objects.all().filter(login=fields['login']):
-            #user.login = fields['login']
-            #user.password = fields['password']
+        if Doctor.objects.all().filter(login=fields['login']):
             template = 'core/main.html'
             return render(request, template, {"login": fields["login"]})
 
@@ -145,34 +145,15 @@ def main(request):
         return redirect('/')
 
 
-
+# ok
 def db_patients(request, login):
 
     global g_login
     g_login = login
 
-    #if request.method == "POST":
-    #    patient = Patient()
-
-    #    fields = {
-    #        'number_card': request.POST.get("number_card"),
-    #        'FIO': request.POST.get("FIO"),
-    #        'date_birth': request.POST.get("date_birth"),
-    #        'nationality': request.POST.get("nationality"),
-    #        'education': request.POST.get("education"),
-    #        'address': request.POST.get("address"),
-    #        'job': request.POST.get("job"),
-    #        'position': request.POST.get("position"),
-    #    }
-
-    #    if Patient.objects.all().filter(number_card=fields['number_card']):
-    #        return redirect('/')
-        
-    #else:
     db_patients_form = DbPatientsForm()
-    
 
-    patients = Patient.objects.all()
+    patients = PatientRecord.objects.all()
 
     context = {
         'login': login,
@@ -184,9 +165,8 @@ def db_patients(request, login):
 
 
 
-
+# ok
 def job_with_db_patients(request):
-
     if request.method == "POST":
 
         fields = {
@@ -194,66 +174,38 @@ def job_with_db_patients(request):
             'FIO': request.POST.get("FIO"),
             'date_birth': request.POST.get("date_birth"),
             'sex': request.POST.get("sex"),
-            'nationality': request.POST.get("nationality"),
-            'education': request.POST.get("education"),
             'address': request.POST.get("address"),
             'phone': request.POST.get("phone"),
-            'job': request.POST.get("job"),
-            'position': request.POST.get("position"),
         }
 
 
 
         if '_add' in request.POST:
-
-            patient = Patient()
-
-            patient.number_card = fields['number_card']
-            patient.FIO = fields['FIO']
-            patient.date_birth = fields['date_birth']
-            patient.sex = fields['sex']
-            patient.nationality = fields['nationality']
-            patient.education = fields['education']
-            patient.address = fields['address']
-            patient.phone = fields['phone']
-            patient.job = fields['job']
-            patient.position = fields['position']
-
-            patient.save()
-
+            try:
+                patient = PatientRecord()
+                patient.NumberRecord = fields['number_card']
+                patient.FIO = fields['FIO']
+                patient.Birthday = fields['date_birth']
+                patient.Sex = fields['sex']
+                patient.Adress = fields['address']
+                patient.Phone = fields['phone']
+                patient.save()
+            except ObjectDoesNotExist:
+                return redirect('/doctor-' + g_login + '/db-patients/')
 
 
         if '_delete' in request.POST:
-            if Patient.objects.all().filter(number_card=fields['number_card']):
-                Patient.objects.all().filter(number_card=fields['number_card']).delete()
-        else:
-            return redirect('/doctor-' + g_login + '/db-patients/')
-
-         
-
-
-        #if '_change' in request.POST:
-
-
-
-
-
+            try:
+                if PatientRecord.objects.all().filter(NumberRecord=fields['number_card']):
+                    PatientRecord.objects.all().filter(NumberRecord=fields['number_card']).delete()
+                else:
+                    return redirect('/doctor-' + g_login + '/db-patients/')
+            except ObjectDoesNotExist:
+                    return redirect('/doctor-' + g_login + '/db-patients/')
         return redirect('/doctor-' + g_login + '/db-patients/')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ok
 def delete_patient(request):
 
     if request.method == "POST":
@@ -271,24 +223,20 @@ def delete_patient(request):
             'position': request.POST.get("position"),
         }
 
-        patient = Patient()
-
-        patient.number_card = fields['number_card']
-        patient.FIO = fields['FIO']
-        patient.date_birth = fields['date_birth']
-        patient.sex = fields['sex']
-        patient.nationality = fields['nationality']
-        patient.education = fields['education']
-        patient.address = fields['address']
-        patient.phone = fields['phone']
-        patient.job = fields['job']
-        patient.position = fields['position']
-
-        patient.save()
-
+        try:
+            patient = PatientRecord()
+            patient.number_card = fields['number_card']
+            patient.FIO = fields['FIO']
+            patient.date_birth = fields['date_birth']
+            patient.sex = fields['sex']
+            patient.address = fields['address']
+            patient.phone = fields['phone']
+            patient.save()
+        except ObjectDoesNotExist:
+            return redirect('/doctor-' + g_login + '/db-patients/')
     return redirect('/doctor-' + g_login + '/db-patients/')
 
-
+# ok
 def change_patient(request):
 
     if request.method == "POST":
@@ -305,28 +253,27 @@ def change_patient(request):
             'job': request.POST.get("job"),
             'position': request.POST.get("position"),
         }
-
-        patient = Patient()
-
-        patient.number_card = fields['number_card']
-        patient.FIO = fields['FIO']
-        patient.date_birth = fields['date_birth']
-        patient.sex = fields['sex']
-        patient.nationality = fields['nationality']
-        patient.education = fields['education']
-        patient.address = fields['address']
-        patient.phone = fields['phone']
-        patient.job = fields['job']
-        patient.position = fields['position']
-
-        patient.save()
-
+        try:
+            patient = Patient()
+            patient.number_card = fields['number_card']
+            patient.FIO = fields['FIO']
+            patient.date_birth = fields['date_birth']
+            patient.sex = fields['sex']
+            patient.nationality = fields['nationality']
+            patient.education = fields['education']
+            patient.address = fields['address']
+            patient.phone = fields['phone']
+            patient.job = fields['job']
+            patient.position = fields['position']
+            patient.save()
+        except ObjectDoesNotExist:
+            return redirect('/doctor-' + g_login + '/db-patients/')
     return redirect('/doctor-' + g_login + '/db-patients/')
 
 
 
 
-
+# ok
 def db_questions(request, login):
 
     global g_login
@@ -335,7 +282,7 @@ def db_questions(request, login):
     db_questions_form = DbQuestionsForm()
     
 
-    questions = Question.objects.all()
+    questions = Symptom.objects.all()
 
     context = {
         'login': login,
@@ -345,41 +292,35 @@ def db_questions(request, login):
     template = "core/db_questions.html"
     return render(request, template, context)
 
+#ok
 def job_with_db_questions(request):
    
-    if request.method == "POST":
+        if request.method == "POST":
 
-        fields = {
-            'question_id': request.POST.get("question_id"),
-            'question': request.POST.get("question"),
-        }
+            fields = {
+                'question_id': request.POST.get("question_id"),
+                'question': request.POST.get("question"),
+            }
         
         if '_add' in request.POST:
 
-            question = Question()
+            question = Symptom()
 
             if fields['question_id'] !='':
                 question.id = fields['question_id']
-            question.question = fields['question']
+            question.Name = fields['question']
+            question.Description = ''
 
             question.save()
 
-
-        #pdb.set_trace()
         if '_delete' in request.POST:
-            if Question.objects.all().filter(id=fields['question_id']):
-                Question.objects.all().filter(id=fields['question_id']).delete()
+            if Symptom.objects.all().filter(id=fields['question_id']):
+                Symptom.objects.all().filter(id=fields['question_id']).delete()
         else:
             return redirect('/doctor-' + g_login + '/db-questions/')
-
-         
-
-
-        #if '_change' in request.POST:
-
-
         return redirect('/doctor-' + g_login + '/db-questions/')
 
+# ok
 def db_diseases(request, login):
 
     global g_login
@@ -388,7 +329,7 @@ def db_diseases(request, login):
     db_diseases_form = DbDiseasesForm()
     
 
-    diseases = Disease.objects.all()
+    diseases = Diagnos.objects.all()
 
     context = {
         'login': login,
@@ -398,6 +339,7 @@ def db_diseases(request, login):
     template = "core/db_diseases.html"
     return render(request, template, context)
 
+# ok
 def job_with_db_diseases(request):
    
     if request.method == "POST":
@@ -411,12 +353,12 @@ def job_with_db_diseases(request):
         
         if '_add' in request.POST:
 
-            disease = Disease()
+            disease = Diagnos()
 
             if fields['diseases_id'] !='':
                 disease.id = fields['diseases_id']
-            disease.name = fields['name']
-            disease.note = fields['note']
+            disease.Name = fields['name']
+            disease.Description = fields['note']
 
 
             disease.save()
@@ -424,16 +366,10 @@ def job_with_db_diseases(request):
 
         #pdb.set_trace()
         if '_delete' in request.POST:
-            if Disease.objects.all().filter(id=fields['diseases_id']):
-                Disease.objects.all().filter(id=fields['diseases_id']).delete()
+            if Diagnos.objects.all().filter(id=fields['diseases_id']):
+                Diagnos.objects.all().filter(id=fields['diseases_id']).delete()
         else:
             return redirect('/doctor-' + g_login + '/db-diseases/')
-
-         
-
-
-        #if '_change' in request.POST:
-
 
         return redirect('/doctor-' + g_login + '/db-diseases/')
 
@@ -870,6 +806,7 @@ def profile(request,login):
         }
     return render(request, template, context)
 
+
 def work_with_rules(request, login):
     global g_login
     g_login = login
@@ -1016,3 +953,75 @@ def job_with_db_symptoms(request):
 
 
         return redirect('/doctor-' + g_login + '/db-symptoms/')
+
+
+
+
+def directory(request):
+    ruleSymptomes = RuleSymptom.objects.all()
+    symptomes = Symptom.objects.all()
+    diagnoses = Diagnos.objects.all()
+
+    formDiagnos = DiagnosesForm()
+    formSymptom = SymptomesForm()
+
+    context = {
+        'formDiagnos': formDiagnos,
+        'formSymptom': formSymptom,
+        'ruleSymptomes': ruleSymptomes,
+        'diagnoses': diagnoses,
+        'symptomes': symptomes
+    }
+    template = "core/directory.html"
+    return render(request, template, context)
+
+def delete_diagnos(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if Diagnos.objects.all().filter(id=id):
+            Diagnos.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+def add_diagnos(request):
+    error=-1
+
+    if request.method == "POST":
+        name = request.POST.get("nameDiag")
+        if not (Diagnos.objects.all().filter(Name=name) or name==''):
+            diagnos = Diagnos()
+            diagnos.Name=name
+            diagnos.Description=request.POST.get("descriptionDiag")
+            newd = diagnos.save()
+            error=diagnos.id
+        else:
+            error=-2
+    return HttpResponse(error)
+
+def delete_symptom(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if Symptom.objects.all().filter(id=id):
+            Symptom.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+def add_symptom(request):
+    error=-1
+
+    if request.method == "POST":
+        name = request.POST.get("nameSym")
+        if not (Symptom.objects.all().filter(Name=name) or name==''):
+            symptom = Symptom()
+            symptom.Name=name
+            symptom.Description=request.POST.get("descriptionSym")
+            newd = symptom.save()
+            error=symptom.id
+        else:
+            error=-2
+    return HttpResponse(error)
+
+
+
