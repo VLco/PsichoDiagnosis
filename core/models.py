@@ -112,8 +112,8 @@ class Frequency(models.Model):
     Coef = models.FloatField()
 
     class Meta():
-        verbose_name = 'conviction'
-        verbose_name_plural = 'convictions'
+        verbose_name = 'frequency'
+        verbose_name_plural = 'frequency'
 
 class Rule(models.Model):
     Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)

@@ -1,6 +1,7 @@
 import pdb
 import datetime
 import math
+import json
 
 from django.shortcuts import render
 from django.views.generic import View
@@ -94,7 +95,7 @@ def sign_in(request):
 def register(request):
     if request.method == "POST":
         user = Doctor()
-        
+
         fields = {
             'login': request.POST.get("login"),
             'password': request.POST.get("password"),
@@ -958,31 +959,38 @@ def job_with_db_symptoms(request):
 
 
 
-
-
-
-
+######
+#Каталог с диагнозами, симптомами и синтромами
 def directory(request, login):
 
-    ruleSymptomes = RuleSymptom.objects.all()
+    rules = Rule.objects.all()
+    RuleSymptomes = RuleSymptom.objects.all()
     symptomes = Symptom.objects.all()
     diagnoses = Diagnos.objects.all()
 
     formDiagnos = DiagnosesForm()
     formSymptom = SymptomesForm()
 
+    ruleAll = []
+    for rule in rules:
+        diagnos = rule.Diagnos.Name
+        frequency = rule.Frequency.Name
+        num = RuleSymptomes.filter(Rule=rule.id).count()
+        ruleAll.append({'diagnos':diagnos, 'frequency':frequency, 'num':num})
+
+
     context = {
         'login':login,
         'formDiagnos': formDiagnos,
         'formSymptom': formSymptom,
-        'ruleSymptomes': ruleSymptomes,
+        'ruleAll': ruleAll,
         'diagnoses': diagnoses,
         'symptomes': symptomes
     }
     template = "core/directory.html"
     return render(request, template, context)
 
-
+##Диагнозы
 def delete_diagnos(request):
     error=1
     if request.method == "POST":
@@ -1002,8 +1010,32 @@ def add_diagnos(request):
             diagnos = Diagnos()
             diagnos.Name=name
             diagnos.Description=request.POST.get("descriptionDiag")
-            newd = diagnos.save()
+            diagnos.save()
             error=diagnos.id
+        else:
+            error=-2
+    return HttpResponse(error)
+
+def get_diagnos(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if Diagnos.objects.all().filter(id=id):
+            diagnos = Diagnos.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': diagnos.id, 'name':diagnos.Name, 'description':diagnos.Description}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_diagnos(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("idDiag")
+        name = request.POST.get("nameDiag")
+        if  name!='':
+            diagnos = Diagnos.objects.get(id=id)
+            diagnos.Name=name
+            diagnos.Description=request.POST.get("descriptionDiag")
+            diagnos.save()
+            error=0
         else:
             error=-2
     return HttpResponse(error)
@@ -1018,7 +1050,7 @@ def delete_symptom(request):
             error=0
     return HttpResponse(error)
 
-
+##Симптомы
 def add_symptom(request):
     error=-1
 
@@ -1034,6 +1066,31 @@ def add_symptom(request):
             error=-2
     return HttpResponse(error)
 
+def get_symptom(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if Symptom.objects.all().filter(id=id):
+            symptom = Symptom.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': symptom.id, 'name':symptom.Name, 'description':symptom.Description}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_symptom(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("idSym")
+        name = request.POST.get("nameSym")
+        if  name!='':
+            symptom = Symptom.objects.get(id=id)
+            symptom.Name=name
+            symptom.Description=request.POST.get("descriptionSym")
+            symptom.save()
+            error=0
+        else:
+            error=-2
+    return HttpResponse(error)
+
+## Синдромы
 
 def patient_records(request,login):
     records = PatientRecord.objects.all()

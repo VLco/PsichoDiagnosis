@@ -10,11 +10,15 @@ from django.contrib import admin
 # from .models import PravilaRule
 # from .models import Rule
 
+from .models import Rule
+from .models import Frequency
+from .models import Conviction
+
 
 # # Register your models here.
-# admin.site.register(Diagnos)
-# admin.site.register(Epicriz)
-# admin.site.register(Disease)
+admin.site.register(Rule)
+admin.site.register(Frequency)
+admin.site.register(Conviction)
 # admin.site.register(Answer)
 # admin.site.register(Ancket)
 # admin.site.register(Patient)
