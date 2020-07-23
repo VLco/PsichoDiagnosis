@@ -13,10 +13,13 @@ class PatientRecord(models.Model):
         verbose_name = 'patient'
         verbose_name_plural = 'patients'
 
+    def __str__(self):
+        return self.FIO
+
 
 
 class Doctor(models.Model):
-    Patient = models.ManyToManyField(PatientRecord, through='PatientList')
+    #Patient = models.ManyToManyField(PatientRecord, through='PatientList') #useless
     login = models.CharField(max_length=200, verbose_name='login')
     email = models.CharField(max_length=200, verbose_name='email')
     password = models.CharField(max_length=50, verbose_name='password')
