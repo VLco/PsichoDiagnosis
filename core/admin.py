@@ -17,6 +17,8 @@ from .models import *
 admin.site.register(Rule)
 admin.site.register(Frequency)
 admin.site.register(Conviction)
+admin.site.register(RuleSymptom)
+admin.site.register(SelectedSymptomsDoctor)
 admin.site.register(Doctor)
 admin.site.register(PatientRecord)
 admin.site.register(PatientList)

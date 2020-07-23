@@ -14,6 +14,11 @@ from django.core.exceptions import ValidationError
 # from .models import Diagnos
 # from .models import Rule
 # from .models import PravilaRule
+from .models import Frequency
+from .models import Diagnos
+from .models import Symptom
+from .models import Conviction
+from .models import Rule
 
 class SigninForm(forms.Form):
     login = forms.CharField(max_length=50, label="login")
@@ -226,3 +231,56 @@ class UserForm(forms.Form):
     social_networks.widget.attrs.update({'class': 'form-control'})
     position.widget.attrs.update({'class': 'form-control'})
     department.widget.attrs.update({'class': 'form-control'})
+
+class SyndromesForm(forms.Form):
+    idDiagSyn = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id", label="diagnos")
+    idFreqSyn = forms.ModelChoiceField(queryset=Frequency.objects.all(), to_field_name="id", label="frequency")
+
+
+    idDiagSyn.widget.attrs.update({'class': 'form-control'})
+    idFreqSyn.widget.attrs.update({'class': 'form-control'})
+
+class SyndromForm(forms.Form):
+    idRule = forms.IntegerField(required='', label="")
+    idDiagSyn = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id", label="diagnos")
+    idFreqSyn = forms.ModelChoiceField(queryset=Frequency.objects.all(), to_field_name="id", label="frequency")
+
+
+    idDiagSyn.widget.attrs.update({'class': 'form-control'})
+    idFreqSyn.widget.attrs.update({'class': 'form-control'})
+
+class RuleSymptomForm(forms.Form):
+    idSymRow= forms.IntegerField(required='', label="")
+    idSymId= forms.IntegerField(required='', label="")
+    idSRuleRule = forms.IntegerField(required='', label="")
+    idSymRule = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptom")
+    idConvRule = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="conviction")
+
+    idSymRule.widget.attrs.update({'class': 'form-control'})
+    idConvRule.widget.attrs.update({'class': 'form-control'})
+
+class DoctorSymptomForm(forms.Form):
+    idSymRow= forms.IntegerField(required='', label="")
+    idSymId= forms.IntegerField(required='', label="")
+    logDoc = forms.CharField(required='', label="")
+    idSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptom")
+    idConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="conviction")
+    note = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptom")
+
+    idSym.widget.attrs.update({'class': 'form-control'})
+    idConv.widget.attrs.update({'class': 'form-control'})
+    note.widget.attrs.update({'class': 'form-control'})
+
+class uDoctorSymptomForm(forms.Form):
+    uqidSymRow= forms.IntegerField(required='', label="")
+    uqidSymId= forms.IntegerField(required='', label="")
+    uqlogDoc = forms.CharField(required='', label="")
+    uqidSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptoms")
+    uqidConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="convictions")
+    uqnote = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptoms")
+
+    uqidSym.widget.attrs.update({'class': 'form-control'})
+    uqidConv.widget.attrs.update({'class': 'form-control'})
+    uqnote.widget.attrs.update({'class': 'form-control'})
+
+

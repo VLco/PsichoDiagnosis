@@ -15,20 +15,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 
 
-from .models import PatientRecord
-from .models import Doctor
-from .models import PatientList
-from .models import Treatment
-from .models import Epicrisis
-from .models import Diagnosis
-from .models import Diagnos
-from .models import Form
-from .models import Conviction
-from .models import Rule
-from .models import Symptom
-from .models import RuleSymptom
-from .models import SelectedSymptoms
-from .models import Anamesis
+from .models import *
 
 
 
@@ -42,6 +29,14 @@ from .forms import DbDiseasesForm
 from .forms import PostuplenieForm
 from .forms import ProfileForm
 from .forms import DBEpicrizForm
+from .forms import SyndromesForm
+from .forms import SyndromForm
+from .forms import RuleSymptomForm
+from .forms import DoctorSymptomForm
+from .forms import uDoctorSymptomForm
+
+
+
 # from .forms import DbDiagnosesForm
 # from .forms import WorkWithRulesForm
 # from .forms import DBSymptomsForm
@@ -149,17 +144,17 @@ def main(request):
 
 
 # ok
-def db_patients(request, id):
+def db_patients(request, login):
 
-    global g_id
-    g_id = id
+    global g_login
+    g_login = login
 
     db_patients_form = DbPatientsForm()
 
     patients = PatientRecord.objects.all()
 
     context = {
-        'login': id,
+        'login': login,
         'form': db_patients_form,
         'patients': patients,
     }
@@ -970,22 +965,24 @@ def directory(request, login):
 
     formDiagnos = DiagnosesForm()
     formSymptom = SymptomesForm()
+    formSyndrom = SyndromesForm()
 
     ruleAll = []
     for rule in rules:
         diagnos = rule.Diagnos.Name
         frequency = rule.Frequency.Name
         num = RuleSymptomes.filter(Rule=rule.id).count()
-        ruleAll.append({'diagnos':diagnos, 'frequency':frequency, 'num':num})
+        ruleAll.append({'id': rule.id ,'diagnos':diagnos, 'frequency':frequency, 'num':num})
 
 
     context = {
         'login':login,
         'formDiagnos': formDiagnos,
         'formSymptom': formSymptom,
+        'formSyndrom': formSyndrom,
         'ruleAll': ruleAll,
         'diagnoses': diagnoses,
-        'symptomes': symptomes
+        'symptomes': symptomes,
     }
     template = "core/directory.html"
     return render(request, template, context)
@@ -1041,6 +1038,7 @@ def update_diagnos(request):
     return HttpResponse(error)
 
 
+##Симптомы
 def delete_symptom(request):
     error=1
     if request.method == "POST":
@@ -1074,7 +1072,7 @@ def get_symptom(request):
             symptom = Symptom.objects.get(id=id)
             return HttpResponse(json.dumps({'id': symptom.id, 'name':symptom.Name, 'description':symptom.Description}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
-
+    
 def update_symptom(request):
     error=-1
     if request.method == "POST":
@@ -1090,8 +1088,20 @@ def update_symptom(request):
             error=-2
     return HttpResponse(error)
 
-## Синдромы
 
+## Синдромы
+def syndrom_get_form(request):
+    formSyndrom = SyndromesForm()
+    return HttpResponse(formSyndrom)
+
+def delete_syndrom(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if Rule.objects.all().filter(id=id):
+            Rule.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
 def patient_records(request,login):
     records = PatientRecord.objects.all()
     global g_login
@@ -1183,4 +1193,256 @@ def personal_cabinet(request, login):
             }
         return render(request, template, context)
 
+
+def add_syndrom(request):
+    error=-1
+    if request.method == "POST":
+        iddiag = request.POST.get("idDiagSyn")
+        idfreq = request.POST.get("idFreqSyn")
+        rule = Rule()
+        rule.Diagnos=Diagnos.objects.get(id=iddiag)
+        rule.Frequency=Frequency.objects.get(id=idfreq)
+        rule.save()
+        error = rule.id
+        return HttpResponse(json.dumps({'id': error, 'diag':rule.Diagnos.Name, 'freq':rule.Frequency.Name, 'num' :RuleSymptom.objects.all().filter(Rule=rule.id).count()}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+
+def open_syndrom(request, login, id):
+    error=-1
+
+    if RuleSymptom.objects.filter(Rule=id):
+        symptoms = RuleSymptom.objects.all().filter(Rule=id)
+    else:
+        symptoms = []
+    context = {
+        'formRule': SyndromForm(),
+        'fromSym':RuleSymptomForm(),
+        'rule': Rule.objects.get(id=id),
+        'symptomes': symptoms,
+        'login': login
+    }
+
+    template = "core/edit_syndrom.html"
+    return render(request, template, context)
+
+
+
+#####
+#Добавление правил
+def delete_symrule(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if RuleSymptom.objects.all().filter(id=id):
+            RuleSymptom.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+def add_symrule(request):
+    error=-1
+
+    if request.method == "POST":
+        idRul= request.POST.get("idSRuleRule")
+        idSym = request.POST.get("idSymRule")
+        idConv = request.POST.get("idConvRule")
+        ruleSymptom = RuleSymptom()
+        ruleSymptom.Rule = Rule.objects.get(id=idRul)
+        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+        ruleSymptom.save()
+        error=ruleSymptom.id
+        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def get_symrule(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if RuleSymptom.objects.all().filter(id=id):
+            relsym = RuleSymptom.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_symrule(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("idSymId")
+        idRul= request.POST.get("idSRuleRule")
+        idSym = request.POST.get("idSymRule")
+        idConv = request.POST.get("idConvRule")
+        ruleSymptom = RuleSymptom.objects.get(id=id)
+        ruleSymptom.Rule = Rule.objects.get(id=idRul)
+        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+        ruleSymptom.save()
+        error=ruleSymptom.id
+        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_syndrom(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        diag = request.POST.get("diag")
+        freq = request.POST.get("freq")
+        rule = Rule.objects.get(id=id)
+        rule.Diagnos=Diagnos.objects.get(id=diag)
+        rule.Frequency=Frequency.objects.get(id=freq)
+        rule.save()
+        error = rule.id
+        return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+#####
+#Вопросник
+def questionary(request,login):
+
+    id = Doctor.objects.get(login=login).id
+    symptoms=SelectedSymptomsDoctor.objects.filter(Doctor=id)
+
+    context = {
+        'DocForm':DoctorSymptomForm(),
+        'uDocFrom':uDoctorSymptomForm(),
+        'symptomes': symptoms,
+        'login':login
+    }
+
+    template = "core/questionary.html"
+    return render(request, template, context)
+
+def add_questdoc(request):
+    error=-1
+
+    if request.method == "POST":
+        idSym = request.POST.get("idSym")
+        idConv = request.POST.get("idConv")
+        logDoc= request.POST.get("logDoc")
+        idDoc = Doctor.objects.get(login=logDoc).id
+        note= request.POST.get("note")
+
+        selectDoctor = SelectedSymptomsDoctor()
+        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+        selectDoctor.Symptom=Symptom.objects.get(id=idSym)
+        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+        selectDoctor.Note=note
+        selectDoctor.save()
+        error=selectDoctor.id
+        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def delete_questdoc(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if SelectedSymptomsDoctor.objects.all().filter(id=id):
+            SelectedSymptomsDoctor.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+def get_questdoc(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if SelectedSymptomsDoctor.objects.all().filter(id=id):
+            relsym = SelectedSymptomsDoctor.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_questdoc(request):
+    error=-1
+
+    if request.method == "POST":
+        id = request.POST.get("uqidSymId")
+        idSym = request.POST.get("uqidSym")
+        idConv = request.POST.get("uqidConv")
+        logDoc= request.POST.get("uqlogDoc")
+        idDoc = Doctor.objects.all().get(login=logDoc).id
+        note= request.POST.get("uqnote")
+
+        selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
+        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+        selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
+        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+        selectDoctor.Note=note
+        selectDoctor.save()
+        error=selectDoctor.id
+        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def verity_cond(sim, rul):
+    if sim==rul:
+        return 1
+    elif sim+1==rul or sim-1==rul:
+        return 0.6
+    else:
+        return 0
+
+def alg_mamdani_up(request):
+    login = request.POST.get("login")
+    idDoc = Doctor.objects.get(login=login).id
+    selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
+
+
+    # selectDoctor.Symptom
+    # selectDoctor.Conviction
+
+
+    ver_max=0
+    id_max=[]
+
+    #Пробегаем по всем правилам
+    for rule in Rule.objects.all():
+
+        verity_rule=[]
+        includeAll = False
+
+        #Пробегаем по всем под условиям и проверяем вхождение в указанные симптомы
+        for rsymti in RuleSymptom.objects.filter(Rule=rule.id):
+            include = False
+            #Если входит в правило, то назначаем подусловию истинность, иначе считаем нулевой
+            for selectDoctor in selectsDoctor:
+                if selectDoctor.Symptom.id==rsymti.Symptom.id:
+                    include = True
+                    includeAll = True
+                    verity_rule.append(verity_cond(selectDoctor.Conviction.Position, rsymti.Conviction.Position))
+            if not include:
+                verity_rule.append(0)
+
+        #Учитываем только те что включают хотябы один из симптомов
+        if includeAll:
+            #Добавляем в правило не совпавшие симптомы
+            for selectDoctor in selectsDoctor:
+                include = False
+                for rsymti in RuleSymptom.objects.filter(Rule=rule.id):
+                    if selectDoctor.Symptom.id==rsymti.Symptom.id:
+                        include = True
+                if not include:
+                    verity_rule.append(0)
+            #Получаем общее значение истинности
+            mean_ver=0
+            sum_ver=0
+            for veri in verity_rule:
+                sum_ver=sum_ver+veri
+            mean_ver= sum_ver / len(verity_rule)
+
+            #Получаем значение истинности заключения (поменял местами этапы, так проще, разницы нет)
+            fin_ver=mean_ver*rule.Frequency.Coef
+
+            if fin_ver>ver_max:
+                ver_max=fin_ver
+                id_max=[]
+                id_max.append(rule.Diagnos.id)
+            elif fin_ver == ver_max:
+                id_max.append(rule.Diagnos.id)
+
+    result = ""
+    if len(id_max)==0:
+        result="Диагноз не найден"
+    elif len(id_max)>1:
+        result="Диагноз найден " + Diagnos.objects.get(id_max[random.randint(0, len(id_max)-1)]).Name
+    else:
+        result="Диагноз найден " + Diagnos.objects.get(id=id_max[0]).Name
+
+    return HttpResponse(result)
 
