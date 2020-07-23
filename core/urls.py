@@ -41,9 +41,12 @@ urlpatterns = [
     path('syndrom/add/', views.add_syndrom, name="add_syndrom"),
     path('syndrom/open-<id>/doc-<login>/', views.open_syndrom, name="open_syndrom"),
     path('syndrom/update/', views.update_syndrom, name="update_syndrom"),
+
     path('<login>-patient_records/',views.patient_records, name="patient_records"),
     path('patient_records/add/', views.add_patient_records, name="add_patient_records"),
     path('patient_records/delete/', views.delete_patient_records, name="delete_patient_records"),
+    path('patient_records/update/', views.update_patient_records, name="update_patient_records"),
+    path('patient_records/get/', views.get_patient_records, name="get_patient_records"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
 

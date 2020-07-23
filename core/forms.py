@@ -203,6 +203,8 @@ class SymptomesForm(forms.Form):
     descriptionSym.widget.attrs.update({'class': 'form-control'})
 
 class PatientsForm(forms.Form):
+    idRowPatient= forms.IntegerField(required='', label="")
+    idPatient = forms.IntegerField(required='', label="")
     number_card = forms.CharField(required='', max_length=50, label="number card")
     FIO = forms.CharField(required='', max_length=100, label="First last middle name")
     date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))

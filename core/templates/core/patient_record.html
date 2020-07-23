@@ -33,13 +33,13 @@
                             {% for record in records %}
                             <tr>
                                 <td>{{ record.NumberRecord }}</td>
-                                <td>{{ record.FirstLastMiddle }}</td>
+                                <td>{{ record.FIO }}</td>
                                 <td>{{ record.Birthday }}</td>
                                 <td>{{ record.Sex }}</td>
                                 <td>{{ record.Adress }}</td>
                                 <td>{{ record.Phone }}</td>
                                 <td class="td-actions text-right">
-                                    <button type="button" rel="tooltip" class="btn btn-success btn-just-icon btn-sm" data-original-title="" title="">
+                                    <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-success btn-just-icon btn-sm update" data-original-title="" title="">
                                     <i class="material-icons">edit</i>
                                 </button>
                                     <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
@@ -47,7 +47,7 @@
                                 </button>
                                     <button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">
                                     <i class="material-icons">person</i>
-                                    <div class="ripple-container"></div></button>
+                                </button>
                                 </td>
                             </tr>
 
@@ -60,7 +60,7 @@
     </div>
 </div>
 
-<form class="add-form" data-db="records" method="POST">
+<form id="form_add" class="add-form" data-db="records" method="POST">
     <div id="add_patient" class="modal" tabindex="0" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -86,6 +86,10 @@
 
 <script>
     $(document).ready(function() {
+        // Скрываем необходимые поля
+        $('#id_idRowPatient').hide();
+        $('#id_idPatient').hide();
+
         $(".nav-tabs a").click(function() {
             $(this).tab('show');
         });
@@ -99,19 +103,81 @@
 
         $("[data-toggle=tooltip]").tooltip();
 
+        //Очистка формы при вызове
+        $(document).delegate('.add-elem', 'click', function() {
+            var modal_id = $(this).data('target');
 
-        $(document).delegate('.delete', 'click', function() {
+            form_id = "#form_add";
+            $(form_id)[0][2]["value"] = "";
+            $(form_id)[0][3]["value"] = "";
+            $(form_id)[0][4]["value"] = "";
+            $(form_id)[0][5]["value"] = "";
+            $(form_id)[0][6]["value"] = "";
+            $(form_id)[0][7]["value"] = "";
+            $(form_id)[0][8]["value"] = "";
+            $(form_id)[0][9]["value"] = "";
+            $(form_id)[0][11].textContent = "Create";
+        });
+
+
+        //Тут мы только получаем данные для записи (изменение и открытие формы)
+        $(document).delegate('.update', 'click', function() {
+            var idelem = $(this).data('id');
             var id = $(this).data('id');
             var row = $(this).closest("tr").get(0);
+
+
+            url_get = "{% url 'get_patient_records' %}";
+            table_name = "#patient_table";
+            form_name = "#form_add";
+            modal_name = "#add_patient";
+
+            var oTable = $(table_name).dataTable();
+            rowid = oTable.fnGetPosition(row);
+
+            if (url_get != "") {
+                $.post(url_get, {
+                    id: idelem,
+                    dataType: "json",
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data) {
+                    if (data.id != -1) {
+                        $(form_name)[0][2]["value"] = parseInt(rowid);
+                        $(form_name)[0][3]["value"] = parseInt(data.id);
+                        $(form_name)[0][4]["value"] = data.Card_number;
+                        $(form_name)[0][5]["value"] = data.FIO;
+                        $(form_name)[0][6]["value"] = data.Birthday;
+                        $(form_name)[0][7]["value"] = data.Sex;
+                        $(form_name)[0][8]["value"] = data.Adress;
+                        $(form_name)[0][9]["value"] = data.Phone;
+                        $(form_name)[0][11].textContent = "Update";
+                        $(modal_name).modal('show');
+                    } else {
+                        alert("Строка не распознана");
+                    }
+                });
+            } else {
+                alert("Error: url");
+            }
+
+        });
+        // Удаление элемента из таблицы 
+        $(document).delegate('.delete', 'click', function() {
+            var idelem = $(this).data('id');
+            var id = $(this).data('id');
+            var row = $(this).closest("tr").get(0);
+
             url = "{% url 'delete_patient_records' %}";
             table_name = "#patient_table";
+
+            var oTable = $(table_name).dataTable();
+            rowid = oTable.fnGetPosition(row);
 
             if (url != "") {
                 $.post(url, {
                     id: id,
                     'csrfmiddlewaretoken': '{{ csrf_token }}'
                 }, function(data) {
-                    alert(data);
                     if (data == "0") {
                         var oTable = $(table_name).dataTable();
                         oTable.fnDeleteRow(oTable.fnGetPosition(row));
@@ -123,62 +189,100 @@
             } else {
                 alert("Error: url");
             }
-
         });
 
+        // Добавление или изменние данных (обработка формы)
         $('.add-form').submit(function(e) {
             e.preventDefault();
             var db = $(this).data('db');
-            url = "{% url 'add_patient_records' %}";
+            url_add = "{% url 'add_patient_records' %}";
+            url_update = "{% url 'update_patient_records' %}";
             table_name = "#patient_table";
 
-            Card_number = $(this)[0][2]["value"];
-            FIO = $(this)[0][3]["value"];
-            Birthday = $(this)[0][4]["value"];
-            Sex = $(this)[0][5]["value"];
-            Adress = $(this)[0][6]["value"];
-            Phone = $(this)[0][7]["value"];
+            rowid = $(this)[0][2]["value"];
+            iddb = $(this)[0][3]["value"];
+            Card_number = $(this)[0][4]["value"];
+            FIO = $(this)[0][5]["value"];
+            Birthday = $(this)[0][6]["value"];
+            Sex = $(this)[0][7]["value"];
+            Adress = $(this)[0][8]["value"];
+            Phone = $(this)[0][9]["value"];
 
             datain = $(this).serialize();
-            if (url != "") {
-                $.post(url, datain, function(data) {
-                    //alert(data);
-                    if (data == "-1") {
-                        alert("Строка не добавлена");
-                    } else if (data == "-2") {
-                        alert("Строка уже существует");
-                    } else {
-                        var rData = [
-                            Card_number,
-                            FIO,
-                            Birthday,
-                            Sex,
-                            Adress,
-                            Phone,
-                            '<div class="container text-right">' +
-                            '<button type="button" rel="tooltip" class="btn btn-success btn-just-icon btn-sm pr-2" data-original-title="" title=""> ' +
-                            '<i class="material-icons">edit</i>' +
-                            '</button> ' +
-                            '<button type="button" rel="tooltip" data-id="' + "" + '" data-db="' + "" + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
-                            '<i class="material-icons">close</i>' +
-                            '</button>' +
-                            '</div>'
-                        ];
+            if (url_add != "") {
+                if (iddb == "") {
+                    alert(iddb);
+                    $.post(url_add, datain, function(data) {
+                        if (data == "-1") {
+                            alert("Строка не добавлена");
+                        } else if (data == "-2") {
+                            alert("Строка уже существует");
+                        } else {
+                            var rData = [
+                                Card_number,
+                                FIO,
+                                Birthday,
+                                Sex,
+                                Adress,
+                                Phone,
+                                '<div class="container text-right">' +
+                                '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> ' +
+                                '<i class="material-icons">edit</i>' +
+                                '</button> ' +
+                                '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
+                                '<i class="material-icons">close</i>' +
+                                '</button>' +
+                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<i class="material-icons">person</i>' +
+                                '</button>' +
+                                '</div>'
+                            ];
 
-                        $(table_name).DataTable().row.add(rData).draw(false);
+                            $(table_name).DataTable().row.add(rData).draw(false);
 
-                        $('#add_patient').modal('hide');
-                        $('.add-form').trigger('reset');
-                    }
-                });
+                            $('#add_patient').modal('hide');
+                            $('.add-form').trigger('reset');
+                        }
+                    });
+                } else {
+                    $.post(url_update, datain, function(data) {
+                        if (data == "-1") {
+                            alert("Строка не изменена");
+                        } else if (data == "-2") {
+                            alert("Строка пуста");
+                        } else if (data == "0") {
+                            var rData = [
+                                Card_number,
+                                FIO,
+                                Birthday,
+                                Sex,
+                                Adress,
+                                Phone,
+                                '<div class="container text-right">' +
+                                '<button type="button" rel="tooltip" data-id="' + iddb + '" data-db="' + db + '" class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> ' +
+                                '<i class="material-icons">edit</i>' +
+                                '</button> ' +
+                                '<button type="button" rel="tooltip" data-id="' + iddb + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
+                                '<i class="material-icons">close</i>' +
+                                '</button>' +
+                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<i class="material-icons">person</i>' +
+                                '</button>' +
+                                '</div>'
+                            ];
+                            $(table_name).DataTable().row(rowid).data(rData).draw();
+
+                            $('#add_patient').modal('hide');
+                            $('.add-form').trigger('reset');
+                        } else {
+                            alert("Ошибка адресации");
+                        }
+                    });
+                }
             } else {
                 alert("Error: url");
             }
         });
-
-    });
-
-    $(document).ready(function() {
 
     });
 </script>

@@ -1151,6 +1151,35 @@ def add_patient_records(request):
             error=-2
     return HttpResponse(error)
 
+def update_patient_records(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("idPatient")
+        number_card = request.POST.get("number_card")
+        if  number_card!='':
+            patient = PatientRecord.objects.get(id=id)
+            patient.NumberRecord = number_card
+            patient.FIO = request.POST.get("FIO")
+            patient.Birthday = request.POST.get("date_birth")
+            patient.Sex = request.POST.get("sex")
+            patient.Adress = request.POST.get("address")
+            patient.Phone = request.POST.get("phone")
+            patient.save()
+            error=0
+        else:
+            error=-2
+    return HttpResponse(error)
+
+
+def get_patient_records(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if PatientRecord.objects.all().filter(id=id):
+            patient = PatientRecord.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': patient.id, 'Card_number':patient.NumberRecord, 'FIO':patient.FIO, 'Birthday':patient.Birthday.strftime("%Y-%m-%d"), 'Sex':patient.Sex, 'Adress':patient.Adress,'Phone':patient.Phone}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
 
 def personal_cabinet(request, login):
     if not request.method == "POST":
