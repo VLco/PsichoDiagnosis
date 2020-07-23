@@ -763,11 +763,11 @@ def profile(request,login):
 
     profile_form = ProfileForm()
     # pdb.set_trace()
-    user = User.objects.get(login = login)
+    user = Doctor.objects.get(login = login)
     fields_save = {
             'login': "",
             'FIO': "",
-            'postion': "",
+            'position': "",
             'department': "",
             'password': "",
         }
@@ -777,17 +777,17 @@ def profile(request,login):
                 fields_save = {
                     'login': request.POST.get("login"),
                     'FIO': request.POST.get("FIO"),
-                    'postion': request.POST.get("postion"),
+                    'position': request.POST.get("position"),
                     'department': request.POST.get("department"),
                     'password': request.POST.get("password"),
                 }
-                user = User.objects.get(login = login)
+                user = Doctor.objects.get(login = login)
                 user.FIO = fields_save['FIO']
-                if User.objects.all().filter(login = fields_save['login']):
+                if Doctor.objects.all().filter(login = fields_save['login']):
                     donothing = 0
                 else:
                     user.login = fields_save['login']
-                user.Postion = fields_save['postion']
+                user.Position = fields_save['position']
                 user.Department = fields_save['department']
                 user.password = fields_save['password']
                 
@@ -799,7 +799,7 @@ def profile(request,login):
     profile_form = ProfileForm()
     profile_form.fields['FIO'].initial = user.FIO
     profile_form.fields['login'].initial = user.login
-    profile_form.fields['postion'].initial = user.Postion
+    profile_form.fields['position'].initial = user.Position
     profile_form.fields['department'].initial = user.Department
     profile_form.fields['password'].initial = user.password
 
@@ -1146,9 +1146,9 @@ def personal_cabinet(request, login):
     if not request.method == "POST":
         global g_login
         g_login = login
-
         formUser = UserForm()
         user = Doctor.objects.get(login = g_login)
+
         context = {
             'login':login,
             'formUser':formUser,
@@ -1164,7 +1164,7 @@ def personal_cabinet(request, login):
         user.email = request.POST.get("email")
         user.password = request.POST.get("password")
         user.SocialNetwork = request.POST.get("social_networks")
-        user.Postion = request.POST.get("position")
+        user.Position = request.POST.get("position")
         user.Department = request.POST.get("department")
         user.save()
 
@@ -1172,7 +1172,7 @@ def personal_cabinet(request, login):
         formUser.fields['email'].initial = user.email
         formUser.fields['password'].initial = user.password
         formUser.fields['social_networks'].initial = user.SocialNetwork
-        formUser.fields['position'].initial = user.Postion
+        formUser.fields['position'].initial = user.Position
         formUser.fields['department'].initial = user.Department
 
         template = "core/personal_cabinet.html"

@@ -42,7 +42,7 @@ class RegisterForm(forms.Form):
 class DbPatientsForm(forms.Form):
     number_card = forms.CharField(required='', max_length=50, label="number card")
     FIO = forms.CharField(required='', max_length=100, label="First last middle name")
-    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: DD.MM.YYYY'}))
+    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
     sex = forms.CharField(required='', max_length=50, label="sex")
     nationality = forms.CharField(required='', max_length=50, label="nationality")
     education = forms.CharField(required='', max_length=100, label="education")
@@ -102,13 +102,13 @@ class PostuplenieForm(forms.Form):
 class ProfileForm(forms.Form):
     FIO = forms.CharField(required='', label="First last middle name doctor")
     login = forms.CharField(required='', label="login")
-    postion = forms.CharField(required='', label="position")
+    position = forms.CharField(required='', label="position")
     department = forms.CharField(required='', label="department")
     password = forms.CharField(label="login", widget=forms.PasswordInput())
 
     FIO.widget.attrs.update({'class': 'form-control'})
     login.widget.attrs.update({'class': 'form-control'})
-    postion.widget.attrs.update({'class': 'form-control'})
+    position.widget.attrs.update({'class': 'form-control'})
     department.widget.attrs.update({'class': 'form-control'})
     password.widget.attrs.update({'class': 'form-control'})
     
@@ -200,7 +200,7 @@ class SymptomesForm(forms.Form):
 class PatientsForm(forms.Form):
     number_card = forms.CharField(required='', max_length=50, label="number card")
     FIO = forms.CharField(required='', max_length=100, label="First last middle name")
-    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: DD.MM.YYYY'}))
+    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
     sex = forms.CharField(required='', max_length=50, label="sex")
     address = forms.CharField(required='', max_length=100, label="adress")
     phone = forms.CharField(required='', max_length=50, label="phons")

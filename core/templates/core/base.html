@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,12 +35,12 @@
     <nav class="navbar navbar-expand-lg">
         <a class="navbar-brand text-white my-0 mr-md-auto font-weight-normal" href="#">Medical Diagnostics Module</a>
         <nav class="my-2 my-md-0 mr-md-3">
-          <a class="p-2 text-white" href="/">Patient Records</a>
-          <a class="p-2 text-white" href="/person.php">Questionary</a>
-          <a class="p-2 text-white" href="/persondiagnosis.php">Directory</a>
-          <a class="p-2 text-white" href="/persondiagnosis.php">Personal Cabinet</a>
-        </nav>  
-        <a class="btn btn-outline-primary" href="/act/outp.php">Log Out</a>
+            <a class="p-2 text-white" href="{% url 'patient_records' login=login%}">Patient Records</a>
+            <a class="p-2 text-white" href="/person.php">Questionary</a>
+            <a class="p-2 text-white" href="{% url 'directory' login=login%}">Directory</a>
+            <a class="p-2 text-white" href="{% url 'personal_cabinet' login=login%}">Personal Cabinet</a>
+        </nav>
+        <a class="btn btn-outline-primary" href="/">Log Out</a>
 
     </nav>
     {% endblock %}

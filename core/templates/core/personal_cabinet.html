@@ -1,63 +1,68 @@
-{% extends 'core/base.html' %} {% block content %}
-<div class="d-flex justify-content-center mt-5">
-    <div class="col-md-7 mb-1 mt-1 text-white text-center ">
-        <div class="container">
-            <h1 class="jumbotron-heading">Personal cabinet</h1>
-            <p class="lead">Here you can change your personal data</p>
-        </div>
-    </div>
-</div>
-
-<div class="container mt-3">
-
-
-    <p class="text-justify">Email: {{user.email}}</p>
-    <p class="text-justify">FIO: {{user.FIO}}</p>
-    <p class="text-justify">Password:{{user.password}}</p>
-    <p class="text-justify">Social Networks: {{user.SocialNetwork}}</p>
-    <p class="text-justify">Position: {{user.Postion}}</p>
-    <p class="text-justify">Department: {{user.Department}}</p>
-
-    <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change" class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
-</div>
-
-<form class="add-form" data-db="changes" method="POST">
-    <div id="change" class="modal" tabindex="0" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Make changes</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-                </div>
-                <div class="modal-body">
-                    {% csrf_token %} {{ formUser }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
+{% extends 'core/base.html' %}
+{% block title %}Personal cabinet{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center mt-5">
+        <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+            <div class="container">
+                <h1 class="jumbotron-heading">Personal cabinet</h1>
+                <p class="lead">Here you can change your personal data</p>
             </div>
         </div>
     </div>
-</form>
 
-<script>
-    url = "{}"
-    $.post(url)
-</script>
+    <div class="container mt-3">
+
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ user.login }}</h4>
+                <p class="card-text text-dark mx-2">Email: {{ user.email }}</p>
+                <p class="card-text text-dark mx-2">FIO: {{ user.FIO }}</p>
+                <p class="card-text text-dark mx-2">Password:{{ user.password }}</p>
+                <p class="card-text text-dark mx-2">Social Networks: {{ user.SocialNetwork }}</p>
+                <p class="card-text text-dark mx-2">Position: {{ user.Postion }}</p>
+                <p class="card-text text-dark mx-2">Department: {{ user.Department }}</p>
+
+                <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change"
+                   class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
+            </div>
+
+
+        </div>
+    </div>
+
+    <form class="add-form" data-db="changes" method="POST">
+        <div id="change" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Make changes</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %} {{ formUser }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        url = "{}"
+        $.post(url)
+    </script>
 
 
 
-<style>
-    p {
-        color: aliceblue;
-    }
-    
-    .mt-md-5,
-    .my-md-5 {
-        margin-top: 5rem !important;
-    }
-</style>
+    <style>
+        .mt-md-5,
+        .my-md-5 {
+            margin-top: 5rem !important;
+        }
+    </style>
 {% endblock %}
