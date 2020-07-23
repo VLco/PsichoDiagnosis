@@ -1,0 +1,313 @@
+{% extends 'core/base.html' %}
+
+
+{% block content %}
+<div class="d-flex justify-content-center mt-3">
+    <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+        <div class="container">
+            <h1 class="jumbotron-heading">Questionary</h1>
+        </div>
+    </div>
+</div>
+
+
+<div class="card container bg-white mt-3 p-3 box-shadow">
+    <div>
+        <div class="container border-bottom mb-4 ">
+            <form class="pb-3 add-sym" method="POST">
+                {% csrf_token %}
+                {{ DocForm }}
+                <div class="d-flex flex-row-reverse mt-3">
+                    <button type="submit" class="btn btn-success">Add Symptom</button>
+                </div>
+                
+            </form>
+        </div>
+        
+        <table id="symptom_table" class="table table-striped table-bordered " cellspacing="0" style="width:100%">
+            <thead>
+                <a id="symptom_btn" href="#"  class="btn btn-primary btn-xs pull-left">Get Diagnos</a>
+                <tr>
+                    <th>Symptom</th>
+                    <th>Conviction</th>
+                    <th>Note</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for symptom in symptomes %}
+                <tr>
+                    <td>{{ symptom.Symptom.Name }}</td>
+                    <td>{{ symptom.Conviction.Name }}</td>
+                    <td>{{ symptom.Note }}</td>
+                    <td class="td-actions text-right">
+                        <button type="button" rel="tooltip" data-id="{{ symptom.id }}" class="btn btn-success btn-just-icon btn-sm update" data-original-title="" title="">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button type="button" rel="tooltip" data-id="{{ symptom.id }}" class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
+                            <i class="material-icons">close</i>
+                        </button>
+                    </td>
+                </tr>
+    
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<form id="form_sym" class="add-form" method="POST">
+    <div id="add_symptom" class="modal" tabindex="0" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Create symptom rule</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body container d-flex flex-column">
+              {% csrf_token %}
+              {{ uDocFrom }}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Update</button>
+             </div>
+          </div>
+        </div>
+    </div>
+</form>
+
+
+<script>
+    $(document).ready(function(){
+        // Скрываем и отображаем необходимые поля 
+        $('#id_idSymRow').hide();
+        $('#id_idSymId').hide();
+        $('#id_logDoc').hide();
+        $('#id_logDoc').val("{{login}}");
+        $("#id_uqidSymRow").hide();
+        $("#id_uqidSymId").hide();
+        $("#id_uqlogDoc").hide();
+
+        //Работа с таблицами
+        $('#symptom_table').DataTable({     
+            "aLengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]]
+        });
+        $("[data-toggle=tooltip]").tooltip();
+
+        //Списки формы
+        $('#id_idSym').select2();
+        $('#id_idConv').select2();
+        $("#id_uqidSym").select2();
+        $("#id_uqidConv").select2();
+
+        //Тут мы только получаем данные для записи (изменение и открытие формы)
+        $(document).delegate('.update', 'click', function() { 
+            var idelem = $(this).data('id');
+            var row = $(this).closest("tr").get(0);
+
+            url_get = "{% url 'get_questdoc' %}";
+            form_name= "#form_sym";
+            modal_name= "#add_symptom";
+            table_name= "#symptom_table";
+
+            var oTable = $(table_name).dataTable();
+            rowids = oTable.fnGetPosition(row);
+
+            if(url_get !=""){
+                $.post(url_get, {id:idelem, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                    if(data.id != -1){
+                        $("#id_uqidSymRow").val(parseInt(rowids));
+                        $("#id_uqidSymId").val(data.id);
+                        $("#id_uqlogDoc").val("{{login}}");
+                        $("#id_uqidSym").val(data.sym);
+                        $("#id_uqidConv").val(data.conv);
+                        $("#id_uqnote").val(data.note);
+                        $(modal_name).modal('show');
+                    }
+                    else {
+                        alert("Строка не распознана");
+                    }
+                });
+            } else{
+                alert("Error: url");
+            }
+        });
+
+        // Добавление данных
+        $('.add-sym').submit(function(e){
+            e.preventDefault();
+            url_add = "{% url 'add_questdoc' %}";
+            table_name= "#symptom_table";
+            
+            rowid = $(this)[0][1]["value"];
+            iddb = $(this)[0][1]["value"];
+
+            datain = $(this).serialize();
+            if(url_add !=""){
+                
+                    $.post(url_add, datain, function(data) {
+                    if(data.id == "-1"){
+                        alert("Строка не добавлена");
+                    }else {
+                        var rData = [
+                            data.sym,
+                            data.conv,
+                            data.note,
+                            '<div class="container text-right">'+
+                            '<button type="button" rel="tooltip" data-id="'+data.id+'"  class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> '+
+                               '<i class="material-icons">edit</i>'+
+                            '</button> '+
+                            '<button type="button" rel="tooltip" data-id="'+data.id+'"  class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">'+
+                                '<i class="material-icons">close</i>'+
+                            '</button>'+
+                            '</div>'
+                        ];
+                        $(table_name).DataTable().row.add(rData).draw(false);
+                        
+
+                        $('.add-sym')[0].reset();
+                        $('#id_logDoc').val("{{login}}");
+                        document.getElementById("select2-id_idSym-container").textContent="---------";
+                        document.getElementById("select2-id_idConv-container").textContent="---------";
+                     }
+                    });
+                
+                 
+            } else{
+                alert("Error: url");
+            }
+        });
+
+        // Обновление данных
+        $('.add-form').submit(function(e){
+            e.preventDefault();
+            url_add = "{% url 'add_questdoc' %}";
+            url_update = "{% url 'update_questdoc' %}";
+            table_name= "#symptom_table";
+            
+            rowid = $(this)[0][2]["value"];
+            iddb = $(this)[0][3]["value"];
+            datain = $(this).serialize();
+            if(url_add !=""){
+                    $.post(url_update, datain, function(data) {
+                    if(data.id == "-1"){
+                        alert("Строка не изменена");
+                    } else {;
+                        var rData = [
+                            data.sym,
+                            data.conv,
+                            data.note,
+                            '<div class="container text-right">'+
+                            '<button type="button" rel="tooltip" data-id="'+data.id+'" class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> '+
+                               '<i class="material-icons">edit</i>'+
+                            '</button> '+
+                            '<button type="button" rel="tooltip" data-id="'+data.id+'" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">'+
+                                '<i class="material-icons">close</i>'+
+                            '</button>'+
+                            '</div>'
+                        ];
+                        $(table_name).DataTable().row(rowid).data(rData).draw();
+
+                        $('#add_symptom').modal('hide');
+                        $('.add-form').trigger('reset');
+                        $('#id_uqlogDoc').val("{{login}}");
+                        document.getElementById("select2-id_uqidSym-container").textContent="---------";
+                        document.getElementById("select2-id_uqidConv-container").textContent="---------";
+                    }
+                    });
+                
+                 
+            } else{
+                alert("Error: url");
+            }
+        });
+        symptom_btn
+
+        //Получение диагноза
+        $(document).delegate('#symptom_btn', 'click', function() {
+            login="{{login}}";
+            url="{% url 'alg_mamdani_up' %}"
+            alert(login);
+            $.post(url, {login:login, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                alert(data);
+                // if(data == "0"){
+                //     var oTable = $(table_name).dataTable();
+                //     oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                // }
+                // else {
+                //     alert("Строка не удалена");
+                // }
+            }); 
+        });
+
+        // Удаление элемента из таблицы
+        $(document).delegate('.delete', 'click', function() { 
+            var id = $(this).data('id');
+            var db = $(this).data('db');
+            var row = $(this).closest("tr").get(0);
+            
+            url = "{% url 'delete_questdoc' %}";
+            table_name= "#symptom_table";
+
+            if(url !=""){
+                $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                    if(data == "0"){
+                        var oTable = $(table_name).dataTable();
+                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                    }
+                    else {
+                        alert("Строка не удалена");
+                    }
+                }); 
+            } else{
+                alert("Error: url");
+            }
+        });
+
+    });
+    
+</script>
+
+<style>
+
+ #symptom_table_filter{
+    float: right;
+}
+ #symptom_table_paginate{
+    float: right;
+}
+#symptom_table_length{
+    float: left;
+}
+#symptom_table_length label{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+#symptom_table_length select{
+   margin-left: 5px;
+   margin-right: 5px;
+}
+
+#symptom_table_filter label{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+#symptom_table_filter input{
+    margin-left: 10px;
+}
+
+.add-elem{
+    margin-top: 10px;
+}
+</style>
+
+{% endblock %}

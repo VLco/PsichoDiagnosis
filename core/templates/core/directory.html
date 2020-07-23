@@ -20,10 +20,10 @@
               <a class="nav-link text-dark active" href="#syn">Syndromes</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark " href="#dia">Diagnoses</a>
+              <a class="nav-link text-dark" href="#dia">Diagnoses</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-dark " href="#sym">Symptoms</a>
+              <a class="nav-link text-dark" href="#sym">Symptoms</a>
             </li>
           </ul>
         </div>
@@ -48,10 +48,10 @@
                             <td>{{ rule.frequency }}</td>
                             <td>{{ rule.num }}</td>
                             <td class="td-actions text-right">
-                                <button type="button" rel="tooltip" data-id="{{ diagnos.id }}" data-db="diagnos" class="btn btn-success btn-just-icon btn-sm" data-original-title="" title="">
+                                <a type="button" rel="tooltip" href="{% url 'open_syndrom' id=rule.id login=login %}" class="btn btn-success btn-just-icon btn-sm" data-original-title="" title="">
                                     <i class="material-icons">edit</i>
-                                </button>
-                                <button type="button" rel="tooltip" data-id="{{ diagnos.id }}" data-db="diagnos" class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
+                                </a>
+                                <button type="button" rel="tooltip" data-id="{{ rule.id }}" data-db="syndrom"  class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
                                     <i class="material-icons">close</i>
                                 </button>
                             </td>
@@ -173,19 +173,19 @@
     </div>
 </form>
 
-<form id="form_sym" class="add-form" data-db="symptom" method="POST">
+<form id="form_syn"  class="add-syn"  method="POST">
     <div id="add_syndrom" class="modal" tabindex="0" role="dialog">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Create symptom</h5>
+              <h5 class="modal-title">Create syndrom</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body">
+            <div id="nado" class="modal-body container d-flex flex-column">
               {% csrf_token %}
-              {{ formSymptom }}
+              {{formSyndrom}}
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -195,6 +195,7 @@
         </div>
     </div>
 </form>
+
 
 
 
@@ -226,6 +227,62 @@
         });
         $("[data-toggle=tooltip]").tooltip();
         
+        
+        //Списки формы синдрома
+        $('#id_idDiagSyn').select2({
+            dropdownParent: $("#add_syndrom")
+        });
+        
+        $('#id_idFreqSyn').select2({
+            dropdownParent: $("#add_syndrom")
+        });
+        
+        // Добавление синдрома
+        $('.add-syn').submit(function(e) {
+            e.preventDefault();
+            
+            url_add = "{% url 'add_syndrom' %}";
+            table_name= "#syndrom_table";
+            
+            datain = $(this).serialize();
+            if(true){//Добавление
+                $.post(url_add, datain, function(data) {
+                    if(data.id == "-1"){
+                        alert("Строка не добавлена");
+                    }else {
+                        var rData = [
+                            data.diag,
+                            data.freq,
+                            data.num,
+                            '<div class="container text-right">'+
+                            '<a type="button" rel="tooltip" href="/syndrom/open-'+data.id+'/doc-'+ '{{login}}'+'/" class="btn btn-success btn-just-icon btn-sm mr-1" data-original-title="" title="">'+
+                                    '<i class="material-icons">edit</i>'+
+                            '</a>'+
+                            '<button type="button" rel="tooltip" data-id="'+data.id+'" data-db="syndrom" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">'+
+                                '<i class="material-icons">close</i>'+
+                            '</button>'+
+                            '</div>'
+                        ];
+                        $(table_name).DataTable().row.add(rData).draw(false);
+
+                        $('#add_syndrom').modal('hide');
+                        $('.add-syn').trigger('reset');
+                    }
+                });
+            }
+
+        });
+
+        //Чистая импровизация, обновляет кусок формы (если диагнозы изменились)
+        $(document).delegate('#syndrom_btn', 'click', function(e) {
+            e.preventDefault();
+            $.post("{% url 'syndrom_get_form' %}", {'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(text) {
+                var div = document.createElement('div');
+                div.innerHTML = text;
+                var result = div.firstChild;
+                document.getElementById("id_idDiagSyn").innerHTML = result.innerHTML;
+            });
+        });
 
         //Очистка формы при вызове
         $(document).delegate('.add-elem', 'click', function() { 
@@ -258,6 +315,9 @@
             } else if(db == "symptom"){
                 url = "{% url 'delete_symptom' %}";
                 table_name= "#symptom_table";
+            } else if(db == "syndrom"){
+                url = "{% url 'delete_syndrom' %}";
+                table_name= "#syndrom_table";
             } else{
                 url = "";
                 table_name="";
@@ -267,7 +327,6 @@
                     if(data == "0"){
                         var oTable = $(table_name).dataTable();
                         oTable.fnDeleteRow(oTable.fnGetPosition(row));
-                        
                     }
                     else {
                         alert("Строка не удалена");
@@ -322,6 +381,9 @@
                 alert("Error: url");
             }
         });
+        
+
+            
 
         // Добавление или изменние данных (обработка формы)
         $('.add-form').submit(function(e) {
@@ -419,7 +481,7 @@ body.modal-open[style] {
     padding-right: 0px !important;
 }
 
-.modal::-webkit-scrollbar {
+body.modal::-webkit-scrollbar {
     width: 0 !important; /*removes the scrollbar but still scrollable*/
     /* reference: http://stackoverflow.com/a/26500272/2259400 */
 }
@@ -427,6 +489,13 @@ body.modal-open[style] {
 table{
     width:100%;
 }
+
+
+#nado span{
+    margin-bottom: 5px;
+}
+
+
 #diagnos_table_filter, #symptom_table_filter, #syndrom_table_filter{
     float: right;
 }

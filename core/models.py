@@ -84,6 +84,12 @@ class Diagnos(models.Model):
     class Meta():
         verbose_name = 'diagnos'
         verbose_name_plural = 'diagnoses'
+    
+    def __str__(self):
+        return self.Name
+
+    def __unicode__(self):
+        return self.Name
 
 
 class Form(models.Model):
@@ -106,6 +112,12 @@ class Conviction(models.Model):
     class Meta():
         verbose_name = 'conviction'
         verbose_name_plural = 'convictions'
+    
+    def __str__(self):
+        return self.Name
+
+    def __unicode__(self):
+        return self.Name
 
 class Frequency(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')
@@ -114,6 +126,12 @@ class Frequency(models.Model):
     class Meta():
         verbose_name = 'frequency'
         verbose_name_plural = 'frequency'
+    
+    def __str__(self):
+        return self.Name
+
+    def __unicode__(self):
+        return self.Name
 
 class Rule(models.Model):
     Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
@@ -122,6 +140,7 @@ class Rule(models.Model):
     class Meta():
         verbose_name = 'rule'
         verbose_name_plural = 'rules'
+    
 
 class Symptom(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')
@@ -130,15 +149,27 @@ class Symptom(models.Model):
     class Meta():
         verbose_name = 'symptom'
         verbose_name_plural = 'symptoms'
+    
+    def __str__(self):
+        return self.Name
+
+    def __unicode__(self):
+        return self.Name
 
 class RuleSymptom(models.Model):
-    Rule = models.OneToOneField(Rule, on_delete=models.CASCADE)
+    Rule = models.ForeignKey(Rule, on_delete=models.CASCADE)
     Symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
     Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
 
     class Meta():
         verbose_name = 'rule symptom'
         verbose_name_plural = 'rules symptom'
+    
+    def __str__(self):
+        return self.Name
+
+    def __unicode__(self):
+        return self.Name
 
 
 
@@ -153,6 +184,16 @@ class SelectedSymptoms(models.Model):
         verbose_name = 'selected symptom'
         verbose_name_plural = 'selected symptoms'
 
+class SelectedSymptomsDoctor(models.Model):
+    Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    Symptom = models.ForeignKey(Symptom, on_delete=models.CASCADE)
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+    Note = models.CharField(max_length=50000, verbose_name='note')
+
+    class Meta():
+        verbose_name = 'selected doc symptom'
+        verbose_name_plural = 'selected doc symptoms'
+
 class Anamesis(models.Model):
     Treatment = models.OneToOneField(Treatment, on_delete=models.CASCADE)
     Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
@@ -160,5 +201,6 @@ class Anamesis(models.Model):
     class Meta():
         verbose_name = 'Anamesis'
         verbose_name_plural = 'Anamesises'
+        
 
 

@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import path, re_path
 from core import views
 
-
 urlpatterns = [
+    
     path('', views.base_core, name="base_core"),
     path('sign-in/', views.sign_in, name="sign_in"),
     path('register/', views.register, name="register"),
@@ -25,7 +25,9 @@ urlpatterns = [
     path('doctor-<login>/db-symptoms/', views.db_symptoms, name="db_symptoms"),
     path('job-with-db-symptoms/', views.job_with_db_symptoms, name="job_with_db_symptoms"),
     
-    path('directory/', views.directory, name="directory"),
+    
+    path('directory/doc-<login>/', views.directory, name="directory"),
+    
 
     path('diagnos/delete/', views.delete_diagnos, name="delete_diagnos"),
     path('diagnos/add/', views.add_diagnos, name="add_diagnos"),
@@ -37,9 +39,23 @@ urlpatterns = [
     path('symptom/get/', views.get_symptom, name="get_symptom"),
     path('symptom/update/', views.update_symptom, name="update_symptom"),
 
+    path('syndrom/getform/', views.syndrom_get_form, name="syndrom_get_form"),
+    path('syndrom/delete/', views.delete_syndrom, name="delete_syndrom"),
+    path('syndrom/add/', views.add_syndrom, name="add_syndrom"),
+    path('syndrom/open-<id>/doc-<login>/', views.open_syndrom, name="open_syndrom"),
+    path('syndrom/update/', views.update_syndrom, name="update_syndrom"),
 
+    path('symrule/delete/', views.delete_symrule, name="delete_symrule"),
+    path('symrule/add/', views.add_symrule, name="add_symrule"),
+    path('symrule/get/', views.get_symrule, name="get_symrule"),
+    path('symrule/update/', views.update_symrule, name="update_symrule"),
+    
+    path('questionary/doc-<login>/', views.questionary, name="questionary"),
+    path('questdoc/add/', views.add_questdoc, name="add_questdoc"),
+    path('questdoc/delete/', views.delete_questdoc, name="delete_questdoc"),
+    path('questdoc/get/', views.get_questdoc, name="get_questdoc"),
+    path('questdoc/update/', views.update_questdoc, name="update_questdoc"),
 
-
-
+    path('mamdani/', views.alg_mamdani_up, name="alg_mamdani_up"),
 
 ]
