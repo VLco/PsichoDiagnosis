@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Patient view{% endblock %}
+{% block content %}
+    <div class="d-flex justify-content-center mt-5">
+        <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+            <div class="container">
+                <h1 class="jumbotron-heading">Patient</h1>
+                <p class="lead">You login as {{ user.login }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ patient.FIO }}</h4>
+                <p class="card-text text-dark mx-2">Number Card: {{ patient.NumberRecord }}</p>
+                <p class="card-text text-dark mx-2">Birthday: {{ patient.Birthday }}</p>
+                <p class="card-text text-dark mx-2">Sex: {{ patient.Sex }}</p>
+                <p class="card-text text-dark mx-2">Adress: {{ patient.Adress }}</p>
+                <p class="card-text text-dark mx-2">Phone: {{ patient.Phone }}</p>
+
+
+            </div>
+
+
+        </div>
+    </div>
+{% endblock %}

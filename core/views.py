@@ -2,6 +2,7 @@ import pdb
 import datetime
 import math
 import json
+import random
 
 from django.shortcuts import render
 from django.views.generic import View
@@ -132,7 +133,8 @@ def main(request):
 
         if Doctor.objects.all().filter(login=fields['login']):
             template = 'core/main.html'
-            return render(request, template, {"login": fields["login"]})
+            return HttpResponseRedirect(reverse("patient_records", args=[fields['login']]))
+            #return render(request, template, {"login": fields["login"]})
 
         else:
             signin_form = SigninForm()
@@ -1180,6 +1182,18 @@ def get_patient_records(request):
             return HttpResponse(json.dumps({'id': patient.id, 'Card_number':patient.NumberRecord, 'FIO':patient.FIO, 'Birthday':patient.Birthday.strftime("%Y-%m-%d"), 'Sex':patient.Sex, 'Adress':patient.Adress,'Phone':patient.Phone}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
+def view_patient_records(request, id, login):
+    user = Doctor.objects.get(login=g_login)
+    patient = PatientRecord.objects.get(NumberRecord=id)
+
+    context = {
+        'login': login,
+        'patient': patient,
+        'user': user
+    }
+    template = "core/view_patient.html"
+    return render(request, template, context)
+    pass
 
 def personal_cabinet(request, login):
     if not request.method == "POST":
