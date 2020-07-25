@@ -1,0 +1,359 @@
+{% extends 'core/base.html' %} {% block content %}
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+        <div class="container">
+            <h1 class="jumbotron-heading">Patient records</h1>
+            <p class="lead">On this page you can work with patient data</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-3">
+
+    <div class="card">
+
+        <div class="card-body">
+            <div class="tab-content">
+                <div id="dia" class="tab-pane fade show active " role="tabpanel">
+                    <table id="patient_table" class="table table-striped table-bordered " cellspacing="0" style="width:100%">
+                        <thead>
+                            <a id="patient_btn" href="" data-toggle="modal" data-target="#add_patient" class="btn btn-primary btn-xs pull-left add-elem">Add new record</a>
+                            <tr>
+                                <th>Card number</th>
+                                <th>FIO</th>
+                                <th>Birthday</th>
+                                <th>Sex</th>
+                                <th>Adress</th>
+                                <th>Phone</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td>{{ record.NumberRecord }}</td>
+                                <td>{{ record.FIO }}</td>
+                                <td>{{ record.Birthday }}</td>
+                                <td>{{ record.Sex }}</td>
+                                <td>{{ record.Adress }}</td>
+                                <td>{{ record.Phone }}</td>
+                                <td class="td-actions text-right">
+                                    <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-success btn-just-icon btn-sm update" data-original-title="" title="">
+                                    <i class="material-icons">edit</i>
+                                </button>
+                                    <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
+                                    <i class="material-icons">close</i>
+                                </button>
+                                    <a class="btn btn-info btn-just-icon btn-sm" href="{% url "view_patient_records" record.id login %}">
+                                    <i class="material-icons">person</i>
+                                </a>
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="form_add" class="add-form" data-db="records" method="POST">
+    <div id="add_patient" class="modal" tabindex="0" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create diagnos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %} {{ formRecords }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+<script>
+    $(document).ready(function() {
+        // Скрываем необходимые поля
+        $('#id_idRowPatient').hide();
+        $('#id_idPatient').hide();
+
+        $(".nav-tabs a").click(function() {
+            $(this).tab('show');
+        });
+
+        $('#patient_table').DataTable({
+            "aLengthMenu": [
+                [5, 10, 25, -1],
+                [5, 10, 25, "All"]
+            ]
+        });
+
+        $("[data-toggle=tooltip]").tooltip();
+
+        //Очистка формы при вызове
+        $(document).delegate('.add-elem', 'click', function() {
+            var modal_id = $(this).data('target');
+
+            form_id = "#form_add";
+            $(form_id)[0][2]["value"] = "";
+            $(form_id)[0][3]["value"] = "";
+            $(form_id)[0][4]["value"] = "";
+            $(form_id)[0][5]["value"] = "";
+            $(form_id)[0][6]["value"] = "";
+            $(form_id)[0][7]["value"] = "";
+            $(form_id)[0][8]["value"] = "";
+            $(form_id)[0][9]["value"] = "";
+            $(form_id)[0][11].textContent = "Create";
+        });
+
+
+        //Тут мы только получаем данные для записи (изменение и открытие формы)
+        $(document).delegate('.update', 'click', function() {
+            var idelem = $(this).data('id');
+            var id = $(this).data('id');
+            var row = $(this).closest("tr").get(0);
+
+
+            url_get = "{% url 'get_patient_records' %}";
+            table_name = "#patient_table";
+            form_name = "#form_add";
+            modal_name = "#add_patient";
+
+            var oTable = $(table_name).dataTable();
+            rowid = oTable.fnGetPosition(row);
+
+            if (url_get != "") {
+                $.post(url_get, {
+                    id: idelem,
+                    dataType: "json",
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data) {
+                    if (data.id != -1) {
+                        $(form_name)[0][2]["value"] = parseInt(rowid);
+                        $(form_name)[0][3]["value"] = parseInt(data.id);
+                        $(form_name)[0][4]["value"] = data.Card_number;
+                        $(form_name)[0][5]["value"] = data.FIO;
+                        $(form_name)[0][6]["value"] = data.Birthday;
+                        $(form_name)[0][7]["value"] = data.Sex;
+                        $(form_name)[0][8]["value"] = data.Adress;
+                        $(form_name)[0][9]["value"] = data.Phone;
+                        $(form_name)[0][11].textContent = "Update";
+                        $(modal_name).modal('show');
+                    } else {
+                        alert("Строка не распознана");
+                    }
+                });
+            } else {
+                alert("Error: url");
+            }
+
+        });
+        // Удаление элемента из таблицы
+        $(document).delegate('.delete', 'click', function() {
+            var idelem = $(this).data('id');
+            var id = $(this).data('id');
+            var row = $(this).closest("tr").get(0);
+
+            url = "{% url 'delete_patient_records' %}";
+            table_name = "#patient_table";
+
+            var oTable = $(table_name).dataTable();
+            rowid = oTable.fnGetPosition(row);
+
+            if (url != "") {
+                $.post(url, {
+                    id: id,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data) {
+                    if (data == "0") {
+                        var oTable = $(table_name).dataTable();
+                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
+
+                    } else {
+                        alert("Строка не удалена");
+                    }
+                });
+            } else {
+                alert("Error: url");
+            }
+        });
+
+        // Добавление или изменние данных (обработка формы)
+        $('.add-form').submit(function(e) {
+            e.preventDefault();
+            var db = $(this).data('db');
+            url_add = "{% url 'add_patient_records' %}";
+            url_update = "{% url 'update_patient_records' %}";
+            table_name = "#patient_table";
+
+            rowid = $(this)[0][2]["value"];
+            iddb = $(this)[0][3]["value"];
+            Card_number = $(this)[0][4]["value"];
+            FIO = $(this)[0][5]["value"];
+            Birthday = $(this)[0][6]["value"];
+            Sex = $(this)[0][7]["value"];
+            Adress = $(this)[0][8]["value"];
+            Phone = $(this)[0][9]["value"];
+
+            datain = $(this).serialize();
+            if (url_add != "") {
+                if (iddb == "") {
+                    alert(iddb);
+                    $.post(url_add, datain, function(data) {
+                        if (data == "-1") {
+                            alert("Строка не добавлена");
+                        } else if (data == "-2") {
+                            alert("Строка уже существует");
+                        } else {
+                            var rData = [
+                                Card_number,
+                                FIO,
+                                Birthday,
+                                Sex,
+                                Adress,
+                                Phone,
+                                '<div class="container text-right">' +
+                                '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> ' +
+                                '<i class="material-icons">edit</i>' +
+                                '</button> ' +
+                                '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
+                                '<i class="material-icons">close</i>' +
+                                '</button>' +
+                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<i class="material-icons">person</i>' +
+                                '</button>' +
+                                '</div>'
+                            ];
+
+                            $(table_name).DataTable().row.add(rData).draw(false);
+
+                            $('#add_patient').modal('hide');
+                            $('.add-form').trigger('reset');
+                        }
+                    });
+                } else {
+                    $.post(url_update, datain, function(data) {
+                        if (data == "-1") {
+                            alert("Строка не изменена");
+                        } else if (data == "-2") {
+                            alert("Строка пуста");
+                        } else if (data == "0") {
+                            var rData = [
+                                Card_number,
+                                FIO,
+                                Birthday,
+                                Sex,
+                                Adress,
+                                Phone,
+                                '<div class="container text-right">' +
+                                '<button type="button" rel="tooltip" data-id="' + iddb + '" data-db="' + db + '" class="btn btn-success btn-just-icon btn-sm pr-2 update" data-original-title="" title=""> ' +
+                                '<i class="material-icons">edit</i>' +
+                                '</button> ' +
+                                '<button type="button" rel="tooltip" data-id="' + iddb + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
+                                '<i class="material-icons">close</i>' +
+                                '</button>' +
+                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<i class="material-icons">person</i>' +
+                                '</button>' +
+                                '</div>'
+                            ];
+                            $(table_name).DataTable().row(rowid).data(rData).draw();
+
+                            $('#add_patient').modal('hide');
+                            $('.add-form').trigger('reset');
+                        } else {
+                            alert("Ошибка адресации");
+                        }
+                    });
+                }
+            } else {
+                alert("Error: url");
+            }
+        });
+
+    });
+</script>
+
+
+<style>
+    body.modal-open {
+        overflow: auto;
+    }
+    
+    body.modal-open[style] {
+        padding-right: 0px !important;
+    }
+    
+    .modal::-webkit-scrollbar {
+        width: 0 !important;
+        /*removes the scrollbar but still scrollable*/
+        /* reference: http://stackoverflow.com/a/26500272/2259400 */
+    }
+    
+    table {
+        width: 100%;
+    }
+    
+    #patient_table_filter {
+        float: right;
+    }
+    
+    #patient_table_paginate {
+        float: right;
+    }
+    
+    #patient_table_length {
+        float: left;
+    }
+    
+    #patient_table_length label {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    
+    #patient_table_length select {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    
+    #patient_table label {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    
+    #patient_table input {
+        margin-left: 10px;
+    }
+    
+    .add-elem {
+        margin-top: 10px;
+    }
+    
+    .back-to-top {
+        cursor: pointer;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: none;
+    }
+</style>
+
+
+{% endblock %}

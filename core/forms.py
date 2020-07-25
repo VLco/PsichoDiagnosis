@@ -4,7 +4,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 
-
 # from .models import User
 # #from .models import Doctor
 # from .models import Patient
@@ -12,7 +11,7 @@ from django.core.exceptions import ValidationError
 # from .models import Question
 # from .models import Disease
 # from .models import Epicriz
-
+# from .models import Diagnos
 # from .models import Rule
 # from .models import PravilaRule
 from .models import Frequency
@@ -34,10 +33,12 @@ class SigninForm(forms.Form):
 
 class RegisterForm(forms.Form):
     login = forms.CharField(max_length=50, label="login")
+    email = forms.CharField(max_length=50, label="email")
     password = forms.CharField(max_length=50, label="password", widget=forms.PasswordInput())
     rePassword = forms.CharField(max_length=50, label="repeat password", widget=forms.PasswordInput())
     
     login.widget.attrs.update({'class': 'form-control'})
+    email.widget.attrs.update({'class': 'form-control'})
     password.widget.attrs.update({'class': 'form-control'})
     rePassword.widget.attrs.update({'class': 'form-control'})
 
@@ -46,7 +47,7 @@ class RegisterForm(forms.Form):
 class DbPatientsForm(forms.Form):
     number_card = forms.CharField(required='', max_length=50, label="number card")
     FIO = forms.CharField(required='', max_length=100, label="First last middle name")
-    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: DD.MM.YYYY'}))
+    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
     sex = forms.CharField(required='', max_length=50, label="sex")
     nationality = forms.CharField(required='', max_length=50, label="nationality")
     education = forms.CharField(required='', max_length=100, label="education")
@@ -106,13 +107,13 @@ class PostuplenieForm(forms.Form):
 class ProfileForm(forms.Form):
     FIO = forms.CharField(required='', label="First last middle name doctor")
     login = forms.CharField(required='', label="login")
-    postion = forms.CharField(required='', label="position")
+    position = forms.CharField(required='', label="position")
     department = forms.CharField(required='', label="department")
     password = forms.CharField(label="login", widget=forms.PasswordInput())
 
     FIO.widget.attrs.update({'class': 'form-control'})
     login.widget.attrs.update({'class': 'form-control'})
-    postion.widget.attrs.update({'class': 'form-control'})
+    position.widget.attrs.update({'class': 'form-control'})
     department.widget.attrs.update({'class': 'form-control'})
     password.widget.attrs.update({'class': 'form-control'})
     
@@ -201,10 +202,42 @@ class SymptomesForm(forms.Form):
     nameSym.widget.attrs.update({'class': 'form-control'})
     descriptionSym.widget.attrs.update({'class': 'form-control'})
 
+class PatientsForm(forms.Form):
+    idRowPatient= forms.IntegerField(required='', label="")
+    idPatient = forms.IntegerField(required='', label="")
+    number_card = forms.CharField(required='', max_length=50, label="number card")
+    FIO = forms.CharField(required='', max_length=100, label="First last middle name")
+    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
+    sex = forms.CharField(required='', max_length=50, label="sex")
+    address = forms.CharField(required='', max_length=100, label="adress")
+    phone = forms.CharField(required='', max_length=50, label="phons")
+
+    number_card.widget.attrs.update({'class': 'form-control'})
+    FIO.widget.attrs.update({'class': 'form-control'})
+    date_birth.widget.attrs.update({'class': 'form-control'})
+    sex.widget.attrs.update({'class': 'form-control'})
+    address.widget.attrs.update({'class': 'form-control'})
+    phone.widget.attrs.update({'class': 'form-control'})
+
+class UserForm(forms.Form):
+    FIO = forms.CharField(required='', max_length=50, label="FIO")
+    email = forms.CharField(required='', max_length=100, label="email")
+    password = forms.CharField(required='', max_length=100, label="password")
+    social_networks = forms.CharField(required='', max_length=100, label="social_networks")
+    position = forms.CharField(required='', max_length=100, label="position")
+    department = forms.CharField(required='', max_length=100, label="department")
+
+    FIO.widget.attrs.update({'class': 'form-control'})
+    email.widget.attrs.update({'class': 'form-control'})
+    password.widget.attrs.update({'class': 'form-control'})
+    social_networks.widget.attrs.update({'class': 'form-control'})
+    position.widget.attrs.update({'class': 'form-control'})
+    department.widget.attrs.update({'class': 'form-control'})
+
 class SyndromesForm(forms.Form):
     idDiagSyn = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id", label="diagnos")
     idFreqSyn = forms.ModelChoiceField(queryset=Frequency.objects.all(), to_field_name="id", label="frequency")
-    
+
 
     idDiagSyn.widget.attrs.update({'class': 'form-control'})
     idFreqSyn.widget.attrs.update({'class': 'form-control'})
@@ -213,7 +246,7 @@ class SyndromForm(forms.Form):
     idRule = forms.IntegerField(required='', label="")
     idDiagSyn = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id", label="diagnos")
     idFreqSyn = forms.ModelChoiceField(queryset=Frequency.objects.all(), to_field_name="id", label="frequency")
-    
+
 
     idDiagSyn.widget.attrs.update({'class': 'form-control'})
     idFreqSyn.widget.attrs.update({'class': 'form-control'})
@@ -224,7 +257,7 @@ class RuleSymptomForm(forms.Form):
     idSRuleRule = forms.IntegerField(required='', label="")
     idSymRule = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptom")
     idConvRule = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="conviction")
-    
+
     idSymRule.widget.attrs.update({'class': 'form-control'})
     idConvRule.widget.attrs.update({'class': 'form-control'})
 
@@ -235,7 +268,7 @@ class DoctorSymptomForm(forms.Form):
     idSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptom")
     idConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="conviction")
     note = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptom")
-    
+
     idSym.widget.attrs.update({'class': 'form-control'})
     idConv.widget.attrs.update({'class': 'form-control'})
     note.widget.attrs.update({'class': 'form-control'})
@@ -247,7 +280,7 @@ class uDoctorSymptomForm(forms.Form):
     uqidSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptoms")
     uqidConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="convictions")
     uqnote = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptoms")
-    
+
     uqidSym.widget.attrs.update({'class': 'form-control'})
     uqidConv.widget.attrs.update({'class': 'form-control'})
     uqnote.widget.attrs.update({'class': 'form-control'})

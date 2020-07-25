@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import path, re_path
 from core import views
 
+
 urlpatterns = [
-    
     path('', views.base_core, name="base_core"),
     path('sign-in/', views.sign_in, name="sign_in"),
     path('register/', views.register, name="register"),
@@ -25,10 +25,7 @@ urlpatterns = [
     path('doctor-<login>/db-symptoms/', views.db_symptoms, name="db_symptoms"),
     path('job-with-db-symptoms/', views.job_with_db_symptoms, name="job_with_db_symptoms"),
     
-    
-    path('directory/doc-<login>/', views.directory, name="directory"),
-    
-
+    path('<login>-directory/', views.directory, name="directory"),
     path('diagnos/delete/', views.delete_diagnos, name="delete_diagnos"),
     path('diagnos/add/', views.add_diagnos, name="add_diagnos"),
     path('diagnos/get/', views.get_diagnos, name="get_diagnos"),
@@ -45,11 +42,20 @@ urlpatterns = [
     path('syndrom/open-<id>/doc-<login>/', views.open_syndrom, name="open_syndrom"),
     path('syndrom/update/', views.update_syndrom, name="update_syndrom"),
 
+    path('<login>-patient_records/',views.patient_records, name="patient_records"),
+    path('patient_records/add/', views.add_patient_records, name="add_patient_records"),
+    path('patient_records/delete/', views.delete_patient_records, name="delete_patient_records"),
+    path('patient_records/update/', views.update_patient_records, name="update_patient_records"),
+    path('patient_records/get/', views.get_patient_records, name="get_patient_records"),
+    path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
+
+    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
+
     path('symrule/delete/', views.delete_symrule, name="delete_symrule"),
     path('symrule/add/', views.add_symrule, name="add_symrule"),
     path('symrule/get/', views.get_symrule, name="get_symrule"),
     path('symrule/update/', views.update_symrule, name="update_symrule"),
-    
+
     path('questionary/doc-<login>/', views.questionary, name="questionary"),
     path('questdoc/add/', views.add_questdoc, name="add_questdoc"),
     path('questdoc/delete/', views.delete_questdoc, name="delete_questdoc"),
@@ -57,5 +63,6 @@ urlpatterns = [
     path('questdoc/update/', views.update_questdoc, name="update_questdoc"),
 
     path('mamdani/', views.alg_mamdani_up, name="alg_mamdani_up"),
+
 
 ]

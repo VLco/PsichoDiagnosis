@@ -2,6 +2,7 @@ import pdb
 import datetime
 import math
 import json
+import random
 
 from django.shortcuts import render
 from django.views.generic import View
@@ -15,22 +16,8 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 
 
-from .models import PatientRecord
-from .models import Doctor
-from .models import PatientList
-from .models import Treatment
-from .models import Epicrisis
-from .models import Diagnosis
-from .models import Diagnos
-from .models import Form
-from .models import Conviction
-from .models import Rule
-from .models import Symptom
-from .models import RuleSymptom
-from .models import SelectedSymptoms
-from .models import Anamesis
-from .models import Frequency
-from .models import SelectedSymptomsDoctor
+from .models import *
+
 
 
 
@@ -57,12 +44,14 @@ from .forms import uDoctorSymptomForm
 
 from .forms import DiagnosesForm
 from .forms import SymptomesForm
+from .forms import PatientsForm
+from .forms import UserForm
 
 
 # Create your views here.
 
 g_login = ''
-
+g_id = ''
 # ok
 def base_core(request):
     signin_form = SigninForm()
@@ -144,7 +133,8 @@ def main(request):
 
         if Doctor.objects.all().filter(login=fields['login']):
             template = 'core/main.html'
-            return render(request, template, {"login": fields["login"]})
+            return HttpResponseRedirect(reverse("patient_records", args=[fields['login']]))
+            #return render(request, template, {"login": fields["login"]})
 
         else:
             signin_form = SigninForm()
@@ -770,11 +760,11 @@ def profile(request,login):
 
     profile_form = ProfileForm()
     # pdb.set_trace()
-    user = User.objects.get(login = login)
+    user = Doctor.objects.get(login = login)
     fields_save = {
             'login': "",
             'FIO': "",
-            'postion': "",
+            'position': "",
             'department': "",
             'password': "",
         }
@@ -784,17 +774,17 @@ def profile(request,login):
                 fields_save = {
                     'login': request.POST.get("login"),
                     'FIO': request.POST.get("FIO"),
-                    'postion': request.POST.get("postion"),
+                    'position': request.POST.get("position"),
                     'department': request.POST.get("department"),
                     'password': request.POST.get("password"),
                 }
-                user = User.objects.get(login = login)
+                user = Doctor.objects.get(login = login)
                 user.FIO = fields_save['FIO']
-                if User.objects.all().filter(login = fields_save['login']):
+                if Doctor.objects.all().filter(login = fields_save['login']):
                     donothing = 0
                 else:
                     user.login = fields_save['login']
-                user.Postion = fields_save['postion']
+                user.Position = fields_save['position']
                 user.Department = fields_save['department']
                 user.password = fields_save['password']
                 
@@ -806,7 +796,7 @@ def profile(request,login):
     profile_form = ProfileForm()
     profile_form.fields['FIO'].initial = user.FIO
     profile_form.fields['login'].initial = user.login
-    profile_form.fields['postion'].initial = user.Postion
+    profile_form.fields['position'].initial = user.Position
     profile_form.fields['department'].initial = user.Department
     profile_form.fields['password'].initial = user.password
 
@@ -969,6 +959,7 @@ def job_with_db_symptoms(request):
 ######
 #Каталог с диагнозами, симптомами и синтромами
 def directory(request, login):
+
     rules = Rule.objects.all()
     RuleSymptomes = RuleSymptom.objects.all()
     symptomes = Symptom.objects.all()
@@ -987,13 +978,13 @@ def directory(request, login):
 
 
     context = {
+        'login':login,
         'formDiagnos': formDiagnos,
         'formSymptom': formSymptom,
         'formSyndrom': formSyndrom,
         'ruleAll': ruleAll,
         'diagnoses': diagnoses,
         'symptomes': symptomes,
-        'login':login
     }
     template = "core/directory.html"
     return render(request, template, context)
@@ -1007,6 +998,7 @@ def delete_diagnos(request):
             Diagnos.objects.all().filter(id=id).delete()
             error=0
     return HttpResponse(error)
+
 
 def add_diagnos(request):
     error=-1
@@ -1058,6 +1050,7 @@ def delete_symptom(request):
             error=0
     return HttpResponse(error)
 
+##Симптомы
 def add_symptom(request):
     error=-1
 
@@ -1111,6 +1104,138 @@ def delete_syndrom(request):
             Rule.objects.all().filter(id=id).delete()
             error=0
     return HttpResponse(error)
+def patient_records(request,login):
+    records = PatientRecord.objects.all()
+    global g_login
+    g_login = login
+
+    formRecords = PatientsForm()
+    context = {
+        'login':login,
+        'formRecords':formRecords,
+        'records':records
+    }
+    template = "core/patient_record.html"
+    return render(request, template, context)
+
+
+def delete_patient_records(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if PatientRecord.objects.all().filter(id=id):
+            PatientRecord.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+
+def add_patient_records(request):
+    error=-1
+
+    if request.method == "POST":
+        number_card = request.POST.get("number_card")
+        FIO = request.POST.get("FIO")
+        date_birth = request.POST.get("date_birth")
+        address = request.POST.get("address")
+        phone = request.POST.get("phone")
+        sex = request.POST.get("sex")
+        if not (PatientRecord.objects.all().filter(NumberRecord=number_card) or number_card==''):
+            patient = PatientRecord()
+            patient.NumberRecord = number_card
+            patient.FIO = FIO
+            patient.Birthday = date_birth
+            patient.Adress = address
+            patient.Phone = phone
+            patient.Sex = sex
+            patient.save()
+            error=patient.id
+        else:
+            error=-2
+    return HttpResponse(error)
+
+def update_patient_records(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("idPatient")
+        number_card = request.POST.get("number_card")
+        if  number_card!='':
+            patient = PatientRecord.objects.get(id=id)
+            patient.NumberRecord = number_card
+            patient.FIO = request.POST.get("FIO")
+            patient.Birthday = request.POST.get("date_birth")
+            patient.Sex = request.POST.get("sex")
+            patient.Adress = request.POST.get("address")
+            patient.Phone = request.POST.get("phone")
+            patient.save()
+            error=0
+        else:
+            error=-2
+    return HttpResponse(error)
+
+
+def get_patient_records(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if PatientRecord.objects.all().filter(id=id):
+            patient = PatientRecord.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': patient.id, 'Card_number':patient.NumberRecord, 'FIO':patient.FIO, 'Birthday':patient.Birthday.strftime("%Y-%m-%d"), 'Sex':patient.Sex, 'Adress':patient.Adress,'Phone':patient.Phone}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def view_patient_records(request, id, login):
+    user = Doctor.objects.get(login=g_login)
+    patient = PatientRecord.objects.get(NumberRecord=id)
+
+    context = {
+        'login': login,
+        'patient': patient,
+        'user': user
+    }
+    template = "core/view_patient.html"
+    return render(request, template, context)
+    pass
+
+def personal_cabinet(request, login):
+    if not request.method == "POST":
+        global g_login
+        g_login = login
+        formUser = UserForm()
+        user = Doctor.objects.get(login = g_login)
+
+        context = {
+            'login':login,
+            'formUser':formUser,
+            'user': user
+        }
+        template = "core/personal_cabinet.html"
+        return render(request, template, context)
+
+    if request.method == "POST":
+        formUser = UserForm()
+        user = Doctor.objects.get(login = login)
+        user.FIO = request.POST.get("FIO")
+        user.email = request.POST.get("email")
+        user.password = request.POST.get("password")
+        user.SocialNetwork = request.POST.get("social_networks")
+        user.Position = request.POST.get("position")
+        user.Department = request.POST.get("department")
+        user.save()
+
+        formUser.fields['FIO'].initial = user.FIO
+        formUser.fields['email'].initial = user.email
+        formUser.fields['password'].initial = user.password
+        formUser.fields['social_networks'].initial = user.SocialNetwork
+        formUser.fields['position'].initial = user.Position
+        formUser.fields['department'].initial = user.Department
+
+        template = "core/personal_cabinet.html"
+        context = {
+            'login': login,
+            'form': formUser,
+            'user': user
+            }
+        return render(request, template, context)
+
 
 def add_syndrom(request):
     error=-1
@@ -1140,7 +1265,7 @@ def open_syndrom(request, login, id):
         'symptomes': symptoms,
         'login': login
     }
-    
+
     template = "core/edit_syndrom.html"
     return render(request, template, context)
 
@@ -1218,14 +1343,14 @@ def questionary(request,login):
 
     id = Doctor.objects.get(login=login).id
     symptoms=SelectedSymptomsDoctor.objects.filter(Doctor=id)
-    
+
     context = {
         'DocForm':DoctorSymptomForm(),
         'uDocFrom':uDoctorSymptomForm(),
         'symptomes': symptoms,
         'login':login
     }
-    
+
     template = "core/questionary.html"
     return render(request, template, context)
 
