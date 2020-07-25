@@ -1304,7 +1304,7 @@ def get_symrule(request):
         id = request.POST.get("id")
         if RuleSymptom.objects.all().filter(id=id):
             relsym = RuleSymptom.objects.get(id=id)
-            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id}), content_type="application/json")
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id,'namesym':relsym.Symptom.Name, 'nameconv':relsym.Conviction.Name}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def update_symrule(request):
@@ -1389,7 +1389,7 @@ def get_questdoc(request):
         id = request.POST.get("id")
         if SelectedSymptomsDoctor.objects.all().filter(id=id):
             relsym = SelectedSymptomsDoctor.objects.get(id=id)
-            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note}), content_type="application/json")
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note, 'namesym':relsym.Symptom.Name, 'nameconv':relsym.Conviction.Name}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def update_questdoc(request):
@@ -1425,11 +1425,19 @@ def alg_mamdani_up(request):
     login = request.POST.get("login")
     idDoc = Doctor.objects.get(login=login).id
     selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
+    diag_id = alg_mamdani(selectsDoctor)
+
+    if diag_id == -1:
+        # Диагноз не найден
+        return HttpResponse(json.dumps({'id': -1}), content_type="application/json")
+    else:
+        # Выдаем диагноз
+        diag = Diagnos.objects.get(id=diag_id)
+        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name}), content_type="application/json")
 
 
-    # selectDoctor.Symptom
-    # selectDoctor.Conviction
 
+def alg_mamdani(selectsDoctor):
 
     ver_max=0
     id_max=[]
@@ -1478,14 +1486,18 @@ def alg_mamdani_up(request):
                 id_max.append(rule.Diagnos.id)
             elif fin_ver == ver_max:
                 id_max.append(rule.Diagnos.id)
-
-    result = ""
+                
     if len(id_max)==0:
-        result="Диагноз не найден"
+        # Диагноз не найден
+        return -1
     elif len(id_max)>1:
-        result="Диагноз найден " + Diagnos.objects.get(id_max[random.randint(0, len(id_max)-1)]).Name
+        # Выбираем один из
+        diag = Diagnos.objects.get(id_max[random.randint(0, len(id_max)-1)])
+        return diag.id
     else:
-        result="Диагноз найден " + Diagnos.objects.get(id=id_max[0]).Name
+        # Выдаем диагноз
+        diag = Diagnos.objects.get(id=id_max[0])
+        return diag.id
 
-    return HttpResponse(result)
+    
 
