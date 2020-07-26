@@ -22,7 +22,8 @@ class RegisterForm(forms.Form):
     login = forms.CharField(max_length=50, label="login")
     password = forms.CharField(max_length=50, label="password", widget=forms.PasswordInput())
     rePassword = forms.CharField(max_length=50, label="repeat password", widget=forms.PasswordInput())
-    
+    email = forms.CharField(max_length=50, label="email")
+
     login.widget.attrs.update({'class': 'form-control'})
     email.widget.attrs.update({'class': 'form-control'})
     password.widget.attrs.update({'class': 'form-control'})
