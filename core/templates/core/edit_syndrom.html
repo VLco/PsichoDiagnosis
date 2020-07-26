@@ -97,15 +97,17 @@
         //Списки формы
         $('#id_idDiagSyn').select2();
         $('#id_idFreqSyn').select2();
-        // $('#id_idSymRule').select2({
-        //     dropdownParent: $("#add_symptom")
-        // });
-        // $('#id_idConvRule').select2({
-        //     dropdownParent: $("#add_symptom")
-        // });
+        $('#id_idSymRule').select2({
+            dropdownParent: $("#add_symptom")
+        });
+        $('#id_idConvRule').select2({
+            dropdownParent: $("#add_symptom")
+        });
 
         //Очистка формы при вызове
-        $(document).delegate('.add-elem', 'click', function() { 
+        $(document).delegate('.add-elem', 'click', function() {
+            document.getElementById("select2-id_idSymRule-container").textContent="---------";
+            document.getElementById("select2-id_idConvRule-container").textContent="---------";
             $('.add-form').trigger('reset');
             $('#id_idSRuleRule').val("{{rule.id}}");
             $("#form_sym")[0][8].textContent = "Create";      
@@ -143,17 +145,20 @@
                         $(form_name)[0][3]["value"] = data.id;
                         $(form_name)[0][5]["value"] = data.sym;
                         $(form_name)[0][6]["value"] = data.conv;
+                        document.getElementById("select2-id_idSymRule-container").textContent=data.namesym;
+                        document.getElementById("select2-id_idConvRule-container").textContent=data.nameconv;
                         $(form_name)[0][8].textContent = "Update";
                         $(modal_name).modal('show');
                     }
                     else {
-                        alert("Строка не распознана");
+                        alert("Data not recognized");
                     }
                 });
             } else{
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
+
 
         // Добавление или изменние данных (обработка формы)
         $('.add-form').submit(function(e) {
@@ -170,7 +175,7 @@
                 if(iddb==""){//Добавление
                     $.post(url_add, datain, function(data) {
                     if(data.id == "-1"){
-                        alert("Строка не добавлена");
+                        alert("Line not added");
                     }else {
                         var rData = [
                             data.sym,
@@ -194,7 +199,7 @@
                 } else{//Изменение
                     $.post(url_update, datain, function(data) {
                     if(data.id == "-1"){
-                        alert("Строка не изменена");
+                        alert("The line is not changed");
                     } else {
                         var rData = [
                             data.sym,
@@ -218,7 +223,7 @@
                 }
                  
             } else{
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 
@@ -226,26 +231,30 @@
 
         // Удаление элемента из таблицы
         $(document).delegate('.delete', 'click', function() { 
-            var id = $(this).data('id');
-            var db = $(this).data('db');
-            var row = $(this).closest("tr").get(0);
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                var id = $(this).data('id');
+                var db = $(this).data('db');
+                var row = $(this).closest("tr").get(0);
             
-            url = "{% url 'delete_symrule' %}";
-            table_name= "#symptom_table";
+                url = "{% url 'delete_symrule' %}";
+                table_name= "#symptom_table";
 
-            if(url !=""){
-                $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
-                    if(data == "0"){
-                        var oTable = $(table_name).dataTable();
-                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
-                    }
-                    else {
-                        alert("Строка не удалена");
-                    }
-                }); 
-            } else{
-                alert("Error: url");
+                if(url !=""){
+                    $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                        if(data == "0"){
+                            var oTable = $(table_name).dataTable();
+                            oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                        }
+                        else {
+                          alert("Line not deleted");
+                        }
+                    }); 
+                } else{
+                    alert("Error: url not correct");
+                }
             }
+
         });
 
     });

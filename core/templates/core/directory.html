@@ -15,7 +15,7 @@
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
-                    <a class="nav-link text-dark active" href="#syn">Syndromes</a>
+                    <a class="nav-link text-dark active" href="{% url 'directory' login %}">Syndromes</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-dark " href="#dia">Diagnoses</a>
@@ -194,7 +194,8 @@
 
 
 
-
+<!-- Ссылка для перехода на изменение -->
+<a id="newsyn" href=""></a>
 
 <script>
     $(document).ready(function() {
@@ -240,6 +241,7 @@
             dropdownParent: $("#add_syndrom")
         });
 
+
         // Добавление синдрома
         $('.add-syn').submit(function(e) {
             e.preventDefault();
@@ -251,25 +253,11 @@
             if (true) { //Добавление
                 $.post(url_add, datain, function(data) {
                     if (data.id == "-1") {
-                        alert("Строка не добавлена");
+                        alert("Line not added");
                     } else {
-                        var rData = [
-                            data.diag,
-                            data.freq,
-                            data.num,
-                            '<div class="container text-right">' +
-                            '<a type="button" rel="tooltip" href="/syndrom/open-' + data.id + '/doc-' + '{{login}}' + '/" class="btn btn-success btn-just-icon btn-sm mr-1" data-original-title="" title="">' +
-                            '<i class="material-icons">edit</i>' +
-                            '</a>' +
-                            '<button type="button" rel="tooltip" data-id="' + data.id + '" data-db="syndrom" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
-                            '<i class="material-icons">close</i>' +
-                            '</button>' +
-                            '</div>'
-                        ];
-                        $(table_name).DataTable().row.add(rData).draw(false);
-
-                        $('#add_syndrom').modal('hide');
-                        $('.add-syn').trigger('reset');
+                        // Переход на страницу редактирования
+                        document.getElementById("newsyn").href="/syndrom/open-" + data.id + "/doc-{{login}}/";
+                        document.getElementById("newsyn").click()
                     }
                 });
             }
@@ -277,17 +265,17 @@
         });
 
         //Чистая импровизация, обновляет кусок формы (если диагнозы изменились)
-        $(document).delegate('#syndrom_btn', 'click', function(e) {
-            e.preventDefault();
-            $.post("{% url 'syndrom_get_form' %}", {
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            }, function(text) {
-                var div = document.createElement('div');
-                div.innerHTML = text;
-                var result = div.firstChild;
-                document.getElementById("id_idDiagSyn").innerHTML = result.innerHTML;
-            });
-        });
+        // $(document).delegate('#syndrom_btn', 'click', function(e) {
+        //     e.preventDefault();
+        //     $.post("{% url 'syndrom_get_form' %}", {
+        //         'csrfmiddlewaretoken': '{{ csrf_token }}'
+        //     }, function(text) {
+        //         var div = document.createElement('div');
+        //         div.innerHTML = text;
+        //         var result = div.firstChild;
+        //         document.getElementById("id_idDiagSyn").innerHTML = result.innerHTML;
+        //     });
+        // });
 
         //Очистка формы при вызове
         $(document).delegate('.add-elem', 'click', function() {
@@ -309,37 +297,41 @@
         });
 
         // Удаление элемента из таблицы
-        $(document).delegate('.delete', 'click', function() {
-            var id = $(this).data('id');
-            var db = $(this).data('db');
-            var row = $(this).closest("tr").get(0);
-
-            if (db == "diagnos") {
-                url = "{% url 'delete_diagnos' %}";
-                table_name = "#diagnos_table";
-            } else if (db == "symptom") {
-                url = "{% url 'delete_symptom' %}";
-                table_name = "#symptom_table";
-            } else {
-                url = "";
-                table_name = "";
+        $(document).delegate('.delete', 'click', function() { 
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                var id = $(this).data('id');
+                var db = $(this).data('db');
+                var row = $(this).closest("tr").get(0);
+            
+                if(db == "diagnos"){
+                    url = "{% url 'delete_diagnos' %}";
+                    table_name= "#diagnos_table";
+                } else if(db == "symptom"){
+                    url = "{% url 'delete_symptom' %}";
+                    table_name= "#symptom_table";
+                } else if(db == "syndrom"){
+                    url = "{% url 'delete_syndrom' %}";
+                    table_name= "#syndrom_table";
+                } else{
+                    url = "";
+                    table_name="";
+                }
+                if(url !=""){
+                    $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                        if(data == "0"){
+                            var oTable = $(table_name).dataTable();
+                            oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                        }
+                        else {
+                            alert("Line not deleted");
+                        }
+                    }); 
+                } else{
+                    alert("Error: url");
+                }
             }
-            if (url != "") {
-                $.post(url, {
-                    id: id,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                }, function(data) {
-                    if (data == "0") {
-                        var oTable = $(table_name).dataTable();
-                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
 
-                    } else {
-                        alert("Строка не удалена");
-                    }
-                });
-            } else {
-                alert("Error: url");
-            }
         });
 
         //Тут мы только получаем данные для записи (изменение и открытие формы)
@@ -382,11 +374,11 @@
                         $(form_name)[0][7].textContent = "Update";
                         $(modal_name).modal('show');
                     } else {
-                        alert("Строка не распознана");
+                        alert("Data not recognized");
                     }
                 });
             } else {
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 
@@ -416,9 +408,9 @@
                 if (iddb == "") { //Добавление
                     $.post(url_add, datain, function(data) {
                         if (data == "-1") {
-                            alert("Строка не добавлена");
+                            alert("Line not added");
                         } else if (data == "-2") {
-                            alert("Строка уже существует или пуста");
+                            alert("Line already exists or is empty");
                         } else {
                             var rData = [
                                 name,
@@ -464,13 +456,13 @@
                             $('#add_diagnos').modal('hide');
                             $('.add-form').trigger('reset');
                         } else {
-                            alert("Ошибка адресации");
+                            alert("Addressing error");
                         }
                     });
                 }
 
             } else {
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 

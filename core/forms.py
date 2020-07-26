@@ -20,7 +20,6 @@ class SigninForm(forms.Form):
 
 class RegisterForm(forms.Form):
     login = forms.CharField(max_length=50, label="login")
-    email = forms.CharField(max_length=50, label="email")
     password = forms.CharField(max_length=50, label="password", widget=forms.PasswordInput())
     rePassword = forms.CharField(max_length=50, label="repeat password", widget=forms.PasswordInput())
     

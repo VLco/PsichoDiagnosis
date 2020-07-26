@@ -100,8 +100,8 @@
         //Списки формы
         $('#id_idSym').select2();
         $('#id_idConv').select2();
-        $("#id_uqidSym").select2();
-        $("#id_uqidConv").select2();
+        $("#id_uqidSym").select2({dropdownParent: $("#add_symptom")});
+        $("#id_uqidConv").select2({dropdownParent: $("#add_symptom")});
 
         //Тут мы только получаем данные для записи (изменение и открытие формы)
         $(document).delegate('.update', 'click', function() { 
@@ -125,14 +125,17 @@
                         $("#id_uqidSym").val(data.sym);
                         $("#id_uqidConv").val(data.conv);
                         $("#id_uqnote").val(data.note);
+
+                        document.getElementById("select2-id_uqidSym-container").textContent=data.namesym;
+                        document.getElementById("select2-id_uqidConv-container").textContent=data.nameconv;
                         $(modal_name).modal('show');
                     }
                     else {
-                        alert("Строка не распознана");
+                        alert("Data not recognized");
                     }
                 });
             } else{
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 
@@ -150,7 +153,7 @@
                 
                     $.post(url_add, datain, function(data) {
                     if(data.id == "-1"){
-                        alert("Строка не добавлена");
+                        alert("Line not added");
                     }else {
                         var rData = [
                             data.sym,
@@ -177,9 +180,12 @@
                 
                  
             } else{
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
+
+ 
+
 
         // Обновление данных
         $('.add-form').submit(function(e){
@@ -194,7 +200,7 @@
             if(url_add !=""){
                     $.post(url_update, datain, function(data) {
                     if(data.id == "-1"){
-                        alert("Строка не изменена");
+                        alert("The line is not changed");
                     } else {;
                         var rData = [
                             data.sym,
@@ -221,18 +227,18 @@
                 
                  
             } else{
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
-        symptom_btn
+
+
 
         //Получение диагноза
         $(document).delegate('#symptom_btn', 'click', function() {
             login="{{login}}";
             url="{% url 'alg_mamdani_up' %}"
-            alert(login);
             $.post(url, {login:login, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
-                alert(data);
+                alert("Diagnos: " + data.name);
                 // if(data == "0"){
                 //     var oTable = $(table_name).dataTable();
                 //     oTable.fnDeleteRow(oTable.fnGetPosition(row));
@@ -245,26 +251,30 @@
 
         // Удаление элемента из таблицы
         $(document).delegate('.delete', 'click', function() { 
-            var id = $(this).data('id');
-            var db = $(this).data('db');
-            var row = $(this).closest("tr").get(0);
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                var id = $(this).data('id');
+                var db = $(this).data('db');
+                var row = $(this).closest("tr").get(0);
             
-            url = "{% url 'delete_questdoc' %}";
-            table_name= "#symptom_table";
+                url = "{% url 'delete_questdoc' %}";
+                table_name= "#symptom_table";
 
-            if(url !=""){
-                $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
-                    if(data == "0"){
-                        var oTable = $(table_name).dataTable();
+                if(url !=""){
+                    $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                        if(data == "0"){
+                            var oTable = $(table_name).dataTable();
                         oTable.fnDeleteRow(oTable.fnGetPosition(row));
-                    }
-                    else {
-                        alert("Строка не удалена");
-                    }
-                }); 
-            } else{
-                alert("Error: url");
+                        }
+                        else {
+                            alert("Line not deleted");
+                        }
+                    }); 
+                } else{
+                    alert("Error: url not correct");
+                }
             }
+
         });
 
     });

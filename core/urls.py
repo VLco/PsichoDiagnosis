@@ -4,6 +4,7 @@ from core import views
 
 
 urlpatterns = [
+    
     path('', views.base_core, name="base_core"),
     path('sign-in/', views.sign_in, name="sign_in"),
     path('register/', views.register, name="register"),
@@ -49,10 +50,11 @@ urlpatterns = [
     path('patient_records/get/', views.get_patient_records, name="get_patient_records"),
     path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
 
+    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
+
+    path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
     path('patient_records/view/<id_p>/<login>/treatment=<id_tr>', views.view_treatment, name="view_treatment"),
     path('patient_records/view/<id_p>/<login>/treatment=<id_tr>/diagnosis=<id_d>', views.view_diagnosis, name="view_diagnosis"),
-
-    path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
 
     path('symrule/delete/', views.delete_symrule, name="delete_symrule"),
     path('symrule/add/', views.add_symrule, name="add_symrule"),
