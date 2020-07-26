@@ -19,33 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import *
 
 
-
-
-from .forms import SigninForm
-from .forms import RegisterForm
-from .forms import DbPatientsForm
-# from .forms import DBAncketsForm
-from .forms import DbQuestionsForm
-from .forms import DbDiseasesForm
-from .forms import PostuplenieForm
-from .forms import ProfileForm
-from .forms import DBEpicrizForm
-from .forms import SyndromesForm
-from .forms import SyndromForm
-from .forms import RuleSymptomForm
-from .forms import DoctorSymptomForm
-from .forms import uDoctorSymptomForm
-
-
-
-# from .forms import DbDiagnosesForm
-# from .forms import WorkWithRulesForm
-# from .forms import DBSymptomsForm
-
-from .forms import DiagnosesForm
-from .forms import SymptomesForm
-from .forms import PatientsForm
-from .forms import UserForm
+from .forms import *
 
 
 # Create your views here.
@@ -131,7 +105,7 @@ def main(request):
             'password': request.POST.get("password"),
         }
 
-        if Doctor.objects.all().filter(login=fields['login']):
+        if Doctor.objects.all().filter(login=fields['login'], password=fields['password']):
             template = 'core/main.html'
             return HttpResponseRedirect(reverse("patient_records", args=[fields['login']]))
             #return render(request, template, {"login": fields["login"]})
@@ -139,7 +113,7 @@ def main(request):
         else:
             signin_form = SigninForm()
             template = "core/base_core.html"
-            return render(request, template, {"form": signin_form, "message": "Пользователь с таким логином не зарегистрирован"})
+            return render(request, template, {"form": signin_form, "message": "Login or password is not valid"})
         
     else:
         return redirect('/')
@@ -1182,18 +1156,105 @@ def get_patient_records(request):
             return HttpResponse(json.dumps({'id': patient.id, 'Card_number':patient.NumberRecord, 'FIO':patient.FIO, 'Birthday':patient.Birthday.strftime("%Y-%m-%d"), 'Sex':patient.Sex, 'Adress':patient.Adress,'Phone':patient.Phone}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
-def view_patient_records(request, id, login):
-    user = Doctor.objects.get(login=g_login)
-    patient = PatientRecord.objects.get(NumberRecord=id)
 
+
+def view_patient_records(request, id, login):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(NumberRecord=id)
+    treatment = Treatment.objects.filter(Record=patient)
+    if request.method != "POST":
+        form = formTreatment()
+    if request.method == "POST":
+        formAdd = formTreatment(request.POST)
+        if formAdd.is_valid():
+            tr = Treatment()
+            tr.Record = patient
+            tr.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
+            tr.Name = request.POST.get('name')
+            tr.Note = request.POST.get('note')
+            if tr.Date is request.POST.get('date', False):
+                tr.Date = request.POST.get('date')
+            tr.save()
+            return HttpResponseRedirect(reverse("view_patient_records", args=[patient.NumberRecord, user.login]))
     context = {
         'login': login,
         'patient': patient,
-        'user': user
+        'user': user,
+        'formTreatment': form,
+        "listT": treatment
     }
     template = "core/view_patient.html"
     return render(request, template, context)
     pass
+
+
+def view_treatment(request, id_p, login, id_tr):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(NumberRecord=id_p)
+    treatment = Treatment.objects.get(id=id_tr)
+    diag = Diagnosis.objects.filter(Treatment=treatment)
+    if request.method != "POST":
+        form = formDiagnosis()
+    else:
+        formAdd = formDiagnosis(request.POST)
+        if formAdd.is_valid():
+            di = Diagnosis()
+            di.Treatment = treatment
+            di.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
+            di.Name = request.POST.get('name')
+            di.Note = request.POST.get('note')
+            if di.StartDiagnosis is request.POST.get('date', False):
+                di.StartDiagnosis = request.POST.get('date')
+            di.save()
+            return HttpResponseRedirect(reverse("view_treatment", args=[patient.NumberRecord, user.login, treatment.id]))
+    context = {
+        'login': login,
+        'patient': patient,
+        'user': user,
+        'listD': diag,
+        "treatment": treatment,
+        "formDiagnosis": form
+    }
+    template = "core/view_treatment.html"
+    return render(request, template, context)
+    pass
+
+
+def view_diagnosis(request, id_p, login, id_tr, id_d):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(NumberRecord=id_p)
+    treatment = Treatment.objects.get(id=id_tr)
+    diag = Diagnosis.objects.get(id=id_d)
+    listForm = Form.objects.filter(Diagnosis=diag)
+    if request.method != "POST":
+        form = formForm()
+    else:
+        formAdd = formForm(request.POST)
+        if formAdd.is_valid():
+            f = Form()
+            f.Diagnosis = diag
+            f.Diagnos = Diagnos.objects.get(id=request.POST.get('diagnos'))
+            f.Name = request.POST.get('name')
+            f.Note = request.POST.get('note')
+            f.Conviction = request.POST.get('conviction')
+            if f.DateForm is request.POST.get('dateForm', False):
+                f.StartDiagnosis = request.POST.get('dateForm')
+            f.save()
+            return HttpResponseRedirect(
+                reverse("view_diagnosis", args=[patient.NumberRecord, user.login, treatment.id, diag.id]))
+    context = {
+        'login': login,
+        'patient': patient,
+        'user': user,
+        'diagnosis': diag,
+        "treatment": treatment,
+        "listForm": listForm,
+        "formForm": form
+    }
+    template = "core/view_diagnosis.html"
+    return render(request, template, context)
+    pass
+
 
 def personal_cabinet(request, login):
     if not request.method == "POST":

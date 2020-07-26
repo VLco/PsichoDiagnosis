@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import  date
 
 
 class PatientRecord(models.Model):
@@ -48,6 +49,7 @@ class Treatment(models.Model):
     Record = models.ForeignKey(PatientRecord, on_delete=models.CASCADE)
     Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     Name = models.CharField(max_length=200, verbose_name='name')
+    Date = models.DateField(default=date.today())
     Note = models.CharField(max_length=5000, verbose_name='note')
 
     class Meta():

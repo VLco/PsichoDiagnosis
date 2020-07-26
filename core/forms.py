@@ -4,21 +4,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 
-# from .models import User
-# #from .models import Doctor
-# from .models import Patient
-# from .models import Ancket
-# from .models import Question
-# from .models import Disease
-# from .models import Epicriz
-# from .models import Diagnos
-# from .models import Rule
-# from .models import PravilaRule
-from .models import Frequency
-from .models import Diagnos
-from .models import Symptom
-from .models import Conviction
-from .models import Rule
+
+from .models import *
 
 class SigninForm(forms.Form):
     login = forms.CharField(max_length=50, label="login")
@@ -285,4 +272,37 @@ class uDoctorSymptomForm(forms.Form):
     uqidConv.widget.attrs.update({'class': 'form-control'})
     uqnote.widget.attrs.update({'class': 'form-control'})
 
+class formTreatment(forms.Form):
+    doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login")
+    name = forms.CharField(required="")
+    note = forms.CharField(required="")
+    date = forms.DateField(required=False)
 
+    doctor.widget.attrs.update({'class': 'form-control'})
+    name.widget.attrs.update({'class': 'form-control'})
+    note.widget.attrs.update({'class': 'form-control'})
+    date.widget.attrs.update({'class': 'form-control'})
+
+class formDiagnosis(forms.Form):
+    doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login")
+    name = forms.CharField(required="")
+    note = forms.CharField(required="")
+    start_diagnosis = forms.DateField(required=False)
+
+    doctor.widget.attrs.update({'class': 'form-control'})
+    name.widget.attrs.update({'class': 'form-control'})
+    note.widget.attrs.update({'class': 'form-control'})
+    start_diagnosis.widget.attrs.update({'class': 'form-control'})
+
+class formForm(forms.Form):
+    diagnos = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id" )
+    name = forms.CharField()
+    dateForm = forms.DateField(required=False)
+    note = forms.CharField()
+    conviction = forms.IntegerField()
+
+    diagnos.widget.attrs.update({'class': 'form-control'})
+    name.widget.attrs.update({'class': 'form-control'})
+    note.widget.attrs.update({'class': 'form-control'})
+    dateForm.widget.attrs.update({'class': 'form-control'})
+    conviction.widget.attrs.update({'class': 'form-control'})

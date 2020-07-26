@@ -1,10 +1,10 @@
 {% extends 'core/base.html' %}
-{% block title %}Patient view{% endblock %}
+{% block title %}Diagnosis view{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-center mt-5">
         <div class="col-md-7 mb-1 mt-1 text-white text-center ">
             <div class="container">
-                <h1 class="jumbotron-heading">Patient</h1>
+                <h1 class="jumbotron-heading">Diagnosis</h1>
                 <p class="lead">You login as {{ user.login }}</p>
             </div>
         </div>
@@ -15,37 +15,37 @@
         <div class="card">
             <div class="card-body">
                 <div class="border-bottom pb-4">
-                    <h4 class="card-title">{{ patient.FIO }}</h4>
-                    <p class="card-text text-dark mx-2">Number Card: {{ patient.NumberRecord }}</p>
-                    <p class="card-text text-dark mx-2">Birthday: {{ patient.Birthday }}</p>
-                    <p class="card-text text-dark mx-2">Sex: {{ patient.Sex }}</p>
-                    <p class="card-text text-dark mx-2">Adress: {{ patient.Adress }}</p>
-                    <p class="card-text text-dark mx-2">Phone: {{ patient.Phone }}</p>
-
+                    <h4 class="card-title">{{ diagnosis.Name }}</h4>
+                    <p class="card-text text-dark mx-2">Doctor: {{ diagnosis.Doctor }}</p>
+                    <p class="card-text text-dark mx-2">Note: {{ diagnosis.Note }}</p>
+                    <p class="card-text text-dark mx-2">Date: {{ diagnosis.StartDiagnosis }}</p>
                 </div>
 
                 <div class="tab-content">
-                    <div id="dia" class="tab-pane fade show active " role="tabpanel">
-                        <table id="treatment_table" class="table table-striped table-bordered " cellspacing="0"
+                    <div id="form" class="tab-pane fade show active " role="tabpanel">
+                        <table id="form_table" class="table table-striped table-bordered " cellspacing="0"
                                style="width:100%">
                             <thead>
                             <tr>
-                                <a id="treatment_btn" href="" data-toggle="modal" data-target="#add_treatment"
-                                   class="btn btn-primary btn-xs pull-left add-elem">Add new treatment</a>
-                                <th>Doctor</th>
+                                <a id="form_btn" href="" data-toggle="modal" data-target="#add_form"
+                                   class="btn btn-primary btn-xs pull-left add-elem">Add new form</a>
+                                <th>Diagnos</th>
                                 <th>Name</th>
+                                <th>Date form</th>
                                 <th>Note</th>
-                                <th>Date</th>
+                                <th>Conviction</th>
                                 <th class="text-right">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for treatment in listT %}
+                            {% for form in listForm %}
                                 <tr>
-                                    <td>{{ treatment.Doctor }}</td>
-                                    <td>{{ treatment.Name }}</td>
-                                    <td>{{ treatment.Note }}</td>
-                                    <td>{{ treatment.Date }}</td>
+                                    <td>{{ form.Diagnos}}</td>
+                                    <td>{{ form.Name }}</td>
+                                    <td>{{ form.DateForm }}</td>
+                                    <td>{{ form.Note }}</td>
+                                    <td>{{ form.Conviction }}</td>
+
                                     <td class="td-actions text-right">
                                         <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record"
                                                 class="btn btn-success btn-just-icon btn-sm update"
@@ -57,10 +57,7 @@
                                                 data-original-title="" title="">
                                             <i class="material-icons">close</i>
                                         </button>
-                                        <a class="btn btn-info btn-just-icon btn-sm"
-                                           href="{% url "view_treatment" treatment.id user.login treatment.id %}">
-                                            <i class="material-icons">person</i>
-                                        </a>
+
                                     </td>
                                 </tr>
 
@@ -78,7 +75,7 @@
 
 
     <form id="form_add" class="add-form" data-db="records" method="POST">
-        <div id="add_treatment" class="modal" tabindex="0" role="dialog">
+        <div id="add_form" class="modal" tabindex="0" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -88,7 +85,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        {% csrf_token %} {{ formTreatment }}
+                        {% csrf_token %} {{ formForm }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -101,7 +98,7 @@
 
 
     <script>
-        $('#treatment_table').DataTable({
+        $('#form_table').DataTable({
             "aLengthMenu": [
                 [5, 10, 25, -1],
                 [5, 10, 25, "All"]
@@ -129,38 +126,38 @@
             width: 100%;
         }
 
-        #treatment_table_filter {
+        #form_table_filter {
             float: right;
         }
 
-        #treatment_table_paginate {
+        #form_table_paginate {
             float: right;
         }
 
-        #treatment_table_length {
+        #form_table_length {
             float: left;
         }
 
-        #treatment_table_length label {
+        #form_table_length label {
             display: flex;
             flex-direction: row;
             justify-content: center;
             margin-top: 15px;
         }
 
-        #treatment_table_length select {
+        #form_table_length select {
             margin-left: 5px;
             margin-right: 5px;
         }
 
-        #treatment_table_filter label {
+        #form_table_filter label {
             display: flex;
             flex-direction: row;
             justify-content: center;
             margin-top: 15px;
         }
 
-        #treatment_table_filter input {
+        #form_table_filter input {
             margin-left: 10px;
         }
 
