@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -78,11 +79,11 @@ WSGI_APPLICATION = 'iswork.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql', # postgresql_psycopg2'
-        'NAME': 'psyscan',
-        'USER': 'postgres',
-        'PASSWORD': '123',
-        'HOST': '127.0.0.1',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',#postgresql_psycopg2',
+        'NAME': 'qwsed',
+        'USER': 'vseva',
+        'PASSWORD': 'qwerty', 
+        'HOST': 'localhost',#'127.0.0.1',
         'PORT': '5432',
     }
 }

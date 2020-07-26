@@ -1565,3 +1565,639 @@ def alg_mamdani(selectsDoctor):
 
 
 
+###############################
+#API
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializers import PatientRecordSerializer
+from .serializers import DoctorSerializer
+
+from .serializers import GetPatientListSerializer
+from .serializers import SetPatientListSerializer
+
+from .serializers import GetTreatmentSerializer
+from .serializers import SetTreatmentSerializer
+
+from .serializers import GetEpicrisisSerializer
+from .serializers import SetEpicrisisSerializer
+
+from .serializers import GetDiagnosisSerializer
+from .serializers import SetDiagnosisSerializer
+
+from .serializers import DiagnosSerializer
+
+from .serializers import GetFormSerializer
+from .serializers import SetFormSerializer
+
+from .serializers import GetRuleSerializer
+from .serializers import SetRuleSerializer
+
+from .serializers import SymptomSerializer
+
+from .serializers import GetRuleSymptomSerializer
+from .serializers import SetRuleSymptomSerializer
+
+from .serializers import GetSelectedSymptomsSerializer
+from .serializers import SetSelectedSymptomsSerializer
+
+from .serializers import GetSelectedSymptomsDoctorSerializer
+from .serializers import SetSelectedSymptomsDoctorSerializer
+
+from .serializers import GetAnamesisSerializer
+from .serializers import SetAnamesisSerializer
+
+from django.db.models.base import ObjectDoesNotExist
+from django.db import IntegrityError
+
+#####
+class PatientRecordView(APIView):
+    def get(self, request):
+        patientRecord = PatientRecord.objects.all()
+        serializer = PatientRecordSerializer(patientRecord, many=True)
+        return Response({"PatientRecord": serializer.data})
+
+    def post(self, request):
+        try:
+            patientRecord = request.data.get('PatientRecord')
+            serializer = PatientRecordSerializer(data=patientRecord)
+            if serializer.is_valid(raise_exception=True):
+                patientRecord_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(patientRecord_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_patient_record = get_object_or_404(PatientRecord.objects.all(), pk=pk)
+            data = request.data.get('PatientRecord')
+            serializer = PatientRecordSerializer(instance=saved_patient_record, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                patient_record_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(patient_record_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        article = get_object_or_404(PatientRecord.objects.all(), pk=pk)
+        article.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SinglePatientRecordView(APIView):
+    def get(self, request, pk):
+        patientRecord = get_object_or_404(PatientRecord.objects.all(), pk=pk)
+        serializer = PatientRecordSerializer(patientRecord)
+        return Response({"PatientRecord": serializer.data})
+
+
+#####
+class DoctorView(APIView):
+    def get(self, request, login):
+        doctor = get_object_or_404(Doctor.objects.all(), login=login)
+        serializer = DoctorSerializer(doctor)
+        return Response({"Doctor": serializer.data})
+
+    def put(self, request, login):
+        try:
+            saved_doctor = get_object_or_404(Doctor.objects.all(), login=login)
+            data = request.data.get('Doctor')
+            serializer = DoctorSerializer(instance=saved_doctor, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                doctor_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(doctor_saved.login)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+class LoginDoctorView(APIView):
+    def get(self, request, login, password):
+        doctor = get_object_or_404(Doctor.objects.all(), login=login)
+        if doctor.password==password:
+            return Response({"Doctor": "true"})
+        else:
+            return Response({"Doctor": "false"})
+
+
+
+#####
+class PatientListView(APIView):
+    def get(self, request):
+        patientList = PatientList.objects.all()
+        serializer = GetPatientListSerializer(patientList, many=True)
+        return Response({"PatientList": serializer.data})
+
+    def post(self, request):
+        try:
+            patientList = request.data.get('PatientList')
+            serializer = SetPatientListSerializer(data=patientList)
+            if serializer.is_valid(raise_exception=True):
+                patientList_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(patientList_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_patient_list = get_object_or_404(PatientList.objects.all(), pk=pk)
+            data = request.data.get('PatientList')
+            serializer = SetPatientListSerializer(instance=saved_patient_list, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                patient_list_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(patient_list_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        article = get_object_or_404(PatientList.objects.all(), pk=pk)
+        article.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SinglePatientListView(APIView):
+    def get(self, request, pk):
+        patientList = get_object_or_404(PatientList.objects.all(), pk=pk)
+        serializer = GetPatientListSerializer(patientList)
+        return Response({"PatientList": serializer.data})
+
+
+#####
+class TreatmentView(APIView):
+    def get(self, request):
+        treatment = Treatment.objects.all()
+        serializer = GetTreatmentSerializer(treatment, many=True)
+        return Response({"Treatment": serializer.data})
+
+    def post(self, request):
+        try:
+            treatment = request.data.get('Treatment')
+            serializer = SetTreatmentSerializer(data=treatment)
+            if serializer.is_valid(raise_exception=True):
+                treatment_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(treatment_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_treatment = get_object_or_404(Treatment.objects.all(), pk=pk)
+            data = request.data.get('Treatment')
+            serializer = SetTreatmentSerializer(instance=saved_treatment, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                treatment_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(treatment_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        article = get_object_or_404(Treatment.objects.all(), pk=pk)
+        article.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleTreatmentView(APIView):
+    def get(self, request, pk):
+        treatment = get_object_or_404(Treatment.objects.all(), pk=pk)
+        serializer = GetTreatmentSerializer(treatment)
+        return Response({"Treatment": serializer.data})
+
+
+#####
+class EpicrisisView(APIView):
+    def get(self, request):
+        epicrisis = Epicrisis.objects.all()
+        serializer = GetEpicrisisSerializer(epicrisis, many=True)
+        return Response({"Epicrisis": serializer.data})
+
+    def post(self, request):
+        try:
+            epicrisis = request.data.get('Epicrisis')
+            serializer = SetEpicrisisSerializer(data=epicrisis)
+            if serializer.is_valid(raise_exception=True):
+                epicrisis_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(epicrisis_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_epicrisis = get_object_or_404(Epicrisis.objects.all(), pk=pk)
+            data = request.data.get('Epicrisis')
+            serializer = SetEpicrisisSerializer(instance=saved_epicrisis, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                epicrisis_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(epicrisis_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        article = get_object_or_404(Epicrisis.objects.all(), pk=pk)
+        article.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleEpicrisisView(APIView):
+    def get(self, request, pk):
+        epicrisis = get_object_or_404(Epicrisis.objects.all(), pk=pk)
+        serializer = GetEpicrisisSerializer(epicrisis)
+        return Response({"Epicrisis": serializer.data})
+
+
+#####
+class DiagnosisView(APIView):
+    def get(self, request):
+        diagnosis = Diagnosis.objects.all()
+        serializer = GetDiagnosisSerializer(diagnosis, many=True)
+        return Response({"Diagnosis": serializer.data})
+
+    def post(self, request):
+        try:
+            diagnosis = request.data.get('Diagnosis')
+            serializer = SetDiagnosisSerializer(data=diagnosis)
+            if serializer.is_valid(raise_exception=True):
+                diagnosis_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(diagnosis_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_diagnosis = get_object_or_404(Diagnosis.objects.all(), pk=pk)
+            data = request.data.get('Diagnosis')
+            serializer = SetDiagnosisSerializer(instance=saved_diagnosis, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                diagnosis_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(diagnosis_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        diagnosis = get_object_or_404(Diagnosis.objects.all(), pk=pk)
+        diagnosis.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleDiagnosisView(APIView):
+    def get(self, request, pk):
+        diagnosis = get_object_or_404(Diagnosis.objects.all(), pk=pk)
+        serializer = GetDiagnosisSerializer(diagnosis)
+        return Response({"Diagnosis": serializer.data})
+
+
+#####
+class DiagnosView(APIView):
+    def get(self, request):
+        diagnos = Diagnos.objects.all()
+        serializer = DiagnosSerializer(diagnos, many=True)
+        return Response({"Diagnos": serializer.data})
+
+    def post(self, request):
+        try:
+            diagnos = request.data.get('Diagnos')
+            serializer = DiagnosSerializer(data=diagnos)
+            if serializer.is_valid(raise_exception=True):
+                diagnos_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(diagnos_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_diagnos = get_object_or_404(Diagnos.objects.all(), pk=pk)
+            data = request.data.get('Diagnos')
+            serializer = DiagnosSerializer(instance=saved_diagnos, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                diagnos_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(diagnos_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        diagnos = get_object_or_404(Diagnos.objects.all(), pk=pk)
+        diagnos.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleDiagnosView(APIView):
+    def get(self, request, pk):
+        diagnos = get_object_or_404(Diagnos.objects.all(), pk=pk)
+        serializer = DiagnosSerializer(diagnos)
+        return Response({"Diagnos": serializer.data})
+
+
+#####
+class FormView(APIView):
+    def get(self, request):
+        form = Form.objects.all()
+        serializer = GetFormSerializer(form, many=True)
+        return Response({"Form": serializer.data})
+
+    def post(self, request):
+        try:
+            form = request.data.get('Form')
+            serializer = SetFormSerializer(data=form)
+            if serializer.is_valid(raise_exception=True):
+                form_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(form_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_form = get_object_or_404(Form.objects.all(), pk=pk)
+            data = request.data.get('Form')
+            serializer = SetFormSerializer(instance=saved_form, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                form_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(form_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        form = get_object_or_404(Form.objects.all(), pk=pk)
+        form.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleFormView(APIView):
+    def get(self, request, pk):
+        form = get_object_or_404(Form.objects.all(), pk=pk)
+        serializer = GetFormSerializer(form)
+        return Response({"Form": serializer.data})
+
+#####
+class RuleView(APIView):
+    def get(self, request):
+        rule = Rule.objects.all()
+        serializer = GetRuleSerializer(rule, many=True)
+        return Response({"Rule": serializer.data})
+
+    def post(self, request):
+        try:
+            rule = request.data.get('Rule')
+            serializer = SetRuleSerializer(data=rule)
+            if serializer.is_valid(raise_exception=True):
+                rule_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(rule_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_rule = get_object_or_404(Rule.objects.all(), pk=pk)
+            data = request.data.get('Rule')
+            serializer = SetRuleSerializer(instance=saved_rule, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                rule_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(rule_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        article = get_object_or_404(Rule.objects.all(), pk=pk)
+        article.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleRuleView(APIView):
+    def get(self, request, pk):
+        rule = get_object_or_404(Rule.objects.all(), pk=pk)
+        serializer = GetRuleSerializer(rule)
+        return Response({"Rule": serializer.data})
+
+#####
+class SymptomView(APIView):
+    def get(self, request):
+        symptom = Symptom.objects.all()
+        serializer = SymptomSerializer(symptom, many=True)
+        return Response({"Symptom": serializer.data})
+
+    def post(self, request):
+        try:
+            symptom = request.data.get('Symptom')
+            serializer = SymptomSerializer(data=symptom)
+            if serializer.is_valid(raise_exception=True):
+                symptom_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(symptom_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not created"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_symptom = get_object_or_404(Symptom.objects.all(), pk=pk)
+            data = request.data.get('Symptom')
+            serializer = SymptomSerializer(instance=saved_symptom, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                symptom_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(symptom_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        symptom = get_object_or_404(Symptom.objects.all(), pk=pk)
+        symptom.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleSymptomView(APIView):
+    def get(self, request, pk):
+        symptom = get_object_or_404(Symptom.objects.all(), pk=pk)
+        serializer = SymptomSerializer(symptom)
+        return Response({"Symptom": serializer.data})
+
+
+#####
+class RuleSymptomView(APIView):
+    def get(self, request):
+        ruleSymptom = RuleSymptom.objects.all()
+        serializer = GetRuleSymptomSerializer(ruleSymptom, many=True)
+        return Response({"RuleSymptom": serializer.data})
+
+    def post(self, request):
+        try:
+            ruleSymptom = request.data.get('RuleSymptom')
+            serializer = SetRuleSymptomSerializer(data=ruleSymptom)
+            if serializer.is_valid(raise_exception=True):
+                ruleSymptom_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(ruleSymptom_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_ruleSymptom = get_object_or_404(RuleSymptom.objects.all(), pk=pk)
+            data = request.data.get('RuleSymptom')
+            serializer = SetRuleSymptomSerializer(instance=saved_ruleSymptom, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                ruleSymptom_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(ruleSymptom_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        ruleSymptom = get_object_or_404(RuleSymptom.objects.all(), pk=pk)
+        ruleSymptom.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleRuleSymptomView(APIView):
+    def get(self, request, pk):
+        ruleSymptom = get_object_or_404(RuleSymptom.objects.all(), pk=pk)
+        serializer = GetRuleSymptomSerializer(ruleSymptom)
+        return Response({"RuleSymptom": serializer.data})
+
+
+#####
+class SelectedSymptomsView(APIView):
+    def get(self, request):
+        selectedSymptoms = SelectedSymptoms.objects.all()
+        serializer = GetSelectedSymptomsSerializer(selectedSymptoms, many=True)
+        return Response({"SelectedSymptoms": serializer.data})
+
+    def post(self, request):
+        try:
+            selectedSymptoms = request.data.get('SelectedSymptoms')
+            serializer = SetSelectedSymptomsSerializer(data=selectedSymptoms)
+            if serializer.is_valid(raise_exception=True):
+                selectedSymptoms_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(selectedSymptoms_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_selectedSymptoms = get_object_or_404(SelectedSymptoms.objects.all(), pk=pk)
+            data = request.data.get('SelectedSymptoms')
+            serializer = SetSelectedSymptomsSerializer(instance=saved_selectedSymptoms, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                selectedSymptoms_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(selectedSymptoms_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        selectedSymptoms = get_object_or_404(SelectedSymptoms.objects.all(), pk=pk)
+        selectedSymptoms.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleSelectedSymptomsView(APIView):
+    def get(self, request, pk):
+        selectedSymptoms = get_object_or_404(SelectedSymptoms.objects.all(), pk=pk)
+        serializer = GetSelectedSymptomsSerializer(selectedSymptoms)
+        return Response({"SelectedSymptoms": serializer.data})
+
+
+#####
+class SelectedSymptomsDoctorView(APIView):
+    def get(self, request):
+        selectedSymptomsDoctor = SelectedSymptomsDoctor.objects.all()
+        serializer = GetSelectedSymptomsDoctorSerializer(selectedSymptomsDoctor, many=True)
+        return Response({"SelectedSymptomsDoctor": serializer.data})
+
+    def post(self, request):
+        try:
+            selectedSymptomsDoctor = request.data.get('SelectedSymptomsDoctor')
+            serializer = SetSelectedSymptomsDoctorSerializer(data=selectedSymptomsDoctor)
+            if serializer.is_valid(raise_exception=True):
+                selectedSymptomsDoctor_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(selectedSymptomsDoctor_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        try:
+            saved_selectedSymptomsDoctor = get_object_or_404(SelectedSymptomsDoctor.objects.all(), pk=pk)
+            data = request.data.get('SelectedSymptomsDoctor')
+            serializer = SetSelectedSymptomsDoctorSerializer(instance=saved_selectedSymptomsDoctor, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                selectedSymptomsDoctor_saved = serializer.save()
+            return Response({"success": "'{}' updated successfully".format(selectedSymptomsDoctor_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+        except IntegrityError:
+            return Response({"denied": "not updated"})
+
+    def delete(self, request, pk):
+        selectedSymptomsDoctor = get_object_or_404(SelectedSymptomsDoctor.objects.all(), pk=pk)
+        selectedSymptomsDoctor.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleSelectedSymptomsDoctorView(APIView):
+    def get(self, request, pk):
+        selectedSymptomsDoctor = get_object_or_404(SelectedSymptomsDoctor.objects.all(), pk=pk)
+        serializer = GetSelectedSymptomsDoctorSerializer(selectedSymptomsDoctor)
+        return Response({"SelectedSymptomsDoctor": serializer.data})
+
+
+#####
+class AnamesisView(APIView):
+    def get(self, request):
+        anamesis = Anamesis.objects.all()
+        serializer = GetAnamesisSerializer(anamesis, many=True)
+        return Response({"Anamesis": serializer.data})
+
+    def post(self, request):
+        try:
+            anamesis = request.data.get('Anamesis')
+            serializer = SetAnamesisSerializer(data=anamesis)
+            if serializer.is_valid(raise_exception=True):
+                anamesis_saved = serializer.save()
+            return Response({"success": "'{}' created successfully".format(anamesis_saved.id)})
+        except ObjectDoesNotExist:
+            return Response({"denied": "not updated"})
+
+    def put(self, request, pk):
+        saved_anamesis = get_object_or_404(Anamesis.objects.all(), pk=pk)
+        data = request.data.get('Anamesis')
+        serializer = SetAnamesisSerializer(instance=saved_anamesis, data=data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            anamesis_saved = serializer.save()
+        return Response({"success": "'{}' updated successfully".format(anamesis_saved.id)})
+
+    def delete(self, request, pk):
+        anamesis = get_object_or_404(Anamesis.objects.all(), pk=pk)
+        anamesis.delete()
+        return Response({"message": "`{}` has been deleted.".format(pk)}, status=204)
+
+class SingleAnamesisView(APIView):
+    def get(self, request, pk):
+        anamesis = get_object_or_404(Anamesis.objects.all(), pk=pk)
+        serializer = GetAnamesisSerializer(anamesis)
+        return Response({"Anamesis": serializer.data})
