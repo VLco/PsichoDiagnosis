@@ -316,6 +316,7 @@
                 } else{
                     url = "";
                     table_name="";
+                    
                 }
                 if(url !=""){
                     $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {

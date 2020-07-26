@@ -2,6 +2,48 @@ from django.contrib import admin
 from django.urls import path, re_path
 from core import views
 
+from .views import PatientRecordView
+from .views import SinglePatientRecordView
+
+from .views import DoctorView
+from .views import LoginDoctorView
+
+from .views import PatientListView
+from .views import SinglePatientListView
+
+from .views import TreatmentView
+from .views import SingleTreatmentView
+
+from .views import EpicrisisView
+from .views import SingleEpicrisisView
+
+from .views import DiagnosisView
+from .views import SingleDiagnosisView
+
+from .views import DiagnosView
+from .views import SingleDiagnosView
+
+from .views import FormView
+from .views import SingleFormView
+
+from .views import RuleView
+from .views import SingleRuleView
+
+from .views import SymptomView
+from .views import SingleSymptomView
+
+from .views import RuleSymptomView
+from .views import SingleRuleSymptomView
+
+from .views import SelectedSymptomsView
+from .views import SingleSelectedSymptomsView
+
+from .views import SelectedSymptomsDoctorView
+from .views import SingleSelectedSymptomsDoctorView
+
+from .views import AnamesisView
+from .views import SingleAnamesisView
+
 
 urlpatterns = [
     path('', views.base_core, name="base_core"),
@@ -65,4 +107,60 @@ urlpatterns = [
     path('mamdani/', views.alg_mamdani_up, name="alg_mamdani_up"),
 
 
+
+
+    path('api/patient-record/', PatientRecordView.as_view()),
+    path('api/patient-record/<int:pk>', PatientRecordView.as_view()),
+    path('api/single-patient-record/<int:pk>', SinglePatientRecordView.as_view()),
+
+    path('api/doctor/<login>', DoctorView.as_view()),
+    path('api/login-doctor/<login>/<password>', LoginDoctorView.as_view()),
+
+    path('api/patient-list/', PatientListView.as_view()),
+    path('api/patient-list/<int:pk>', PatientListView.as_view()),
+    path('api/single-patient-list/<int:pk>', SinglePatientListView.as_view()),
+
+    path('api/treatment/', TreatmentView.as_view()),
+    path('api/treatment/<int:pk>', TreatmentView.as_view()),
+    path('api/single-treatment/<int:pk>', SingleTreatmentView.as_view()),
+
+    path('api/epicrisis/', EpicrisisView.as_view()),
+    path('api/epicrisis/<int:pk>', EpicrisisView.as_view()),
+    path('api/single-epicrisis/<int:pk>', SingleEpicrisisView.as_view()),
+
+    path('api/diagnosis/', DiagnosisView.as_view()),
+    path('api/diagnosis/<int:pk>', DiagnosisView.as_view()),
+    path('api/single-diagnosis/<int:pk>', SingleDiagnosisView.as_view()),
+
+    path('api/diagnos/', DiagnosView.as_view()),
+    path('api/diagnos/<int:pk>', DiagnosView.as_view()),
+    path('api/single-diagnos/<int:pk>', SingleDiagnosView.as_view()),
+
+    path('api/form/', FormView.as_view()),
+    path('api/form/<int:pk>', FormView.as_view()),
+    path('api/single-form/<int:pk>', SingleFormView.as_view()),
+
+    path('api/rule/', RuleView.as_view()),
+    path('api/rule/<int:pk>', RuleView.as_view()),
+    path('api/single-rule/<int:pk>', SingleRuleView.as_view()),
+
+    path('api/symptom/', SymptomView.as_view()),
+    path('api/symptom/<int:pk>', SymptomView.as_view()),
+    path('api/single-symptom/<int:pk>', SingleSymptomView.as_view()),
+
+    path('api/rule-symptom/', RuleSymptomView.as_view()),
+    path('api/rule-symptom/<int:pk>', RuleSymptomView.as_view()),
+    path('api/single-rule-symptom/<int:pk>', SingleRuleSymptomView.as_view()),
+    
+    path('api/selected-symptoms/', SelectedSymptomsView.as_view()),
+    path('api/selected-symptoms/<int:pk>', SelectedSymptomsView.as_view()),
+    path('api/single-selected-symptoms/<int:pk>', SingleSelectedSymptomsView.as_view()),
+    
+    path('api/selected-symptoms-doctor/', SelectedSymptomsDoctorView.as_view()),
+    path('api/selected-symptoms-doctor/<int:pk>', SelectedSymptomsDoctorView.as_view()),
+    path('api/single-selected-symptoms-doctor/<int:pk>', SingleSelectedSymptomsDoctorView.as_view()),
+
+    path('api/anamesis/', AnamesisView.as_view()),
+    path('api/anamesis/<int:pk>', AnamesisView.as_view()),
+    path('api/single-anamesis/<int:pk>', SingleAnamesisView.as_view()),
 ]

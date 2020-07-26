@@ -62,7 +62,7 @@ class Epicrisis(models.Model):
     Disability = models.CharField(max_length=1000, verbose_name='disability')
     Hospitalization = models.DateField(default = "1999-01-01", null=True)
     HospitalDischarge = models.DateField(default="1999-01-01", null=True)
-    IsOver = models.IntegerField()
+    IsOver = models.IntegerField(default=0)
 
     class Meta():
         verbose_name = 'epicrisis'
