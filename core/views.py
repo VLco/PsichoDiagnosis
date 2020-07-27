@@ -1258,48 +1258,50 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
     return render(request, template, context)
     pass
 
-
+#####
+#Персона
 def personal_cabinet(request, login):
-    if not request.method == "POST":
-        global g_login
-        g_login = login
-        formUser = UserForm()
-        user = Doctor.objects.get(login = g_login)
+    global g_login
+    g_login = login
+    formUser = UserForm()
+    user = Doctor.objects.get(login = g_login)
+    context = {
+        'login':login,
+        'formUser':formUser,
+        'user': user
+    }
+    template = "core/personal_cabinet.html"
+    
+    return render(request, template, context)
 
-        context = {
-            'login':login,
-            'formUser':formUser,
-            'user': user
-        }
-        template = "core/personal_cabinet.html"
-        return render(request, template, context)
-
+def get_person(request):
+    error=-1
     if request.method == "POST":
-        formUser = UserForm()
-        user = Doctor.objects.get(login = login)
-        user.FIO = request.POST.get("FIO")
-        user.email = request.POST.get("email")
-        user.password = request.POST.get("password")
-        user.SocialNetwork = request.POST.get("social_networks")
-        user.Position = request.POST.get("position")
-        user.Department = request.POST.get("department")
-        user.save()
+        login = request.POST.get("login")
+        if Doctor.objects.all().filter(login = login):
+            user = Doctor.objects.get(login = login)
+            return HttpResponse(json.dumps({'id': user.id, 'FIO':user.FIO, 'email':user.email, 'password':user.password, 'social_network':user.SocialNetwork, 'position':user.Position, 'department':user.Department}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
-        formUser.fields['FIO'].initial = user.FIO
-        formUser.fields['email'].initial = user.email
-        formUser.fields['password'].initial = user.password
-        formUser.fields['social_networks'].initial = user.SocialNetwork
-        formUser.fields['position'].initial = user.Position
-        formUser.fields['department'].initial = user.Department
 
-        template = "core/personal_cabinet.html"
-        context = {
-            'login': login,
-            'form': formUser,
-            'user': user
-            }
-        return render(request, template, context)
 
+def update_person(request):
+    error=-1
+    if request.method == "POST":
+        login = request.POST.get("login")
+        if Doctor.objects.all().filter(login = login):
+            user = Doctor.objects.get(login = login)
+            user.FIO = request.POST.get("FIO")
+            user.email = request.POST.get("email")
+            user.password = request.POST.get("password")
+            user.SocialNetwork = request.POST.get("social_networks")
+            user.Position = request.POST.get("position")
+            user.Department = request.POST.get("department")
+            user.save()
+            return HttpResponse(json.dumps({'id': user.id, 'FIO':user.FIO, 'email':user.email, 'password':user.password, 'social_network':user.SocialNetwork, 'position':user.Position, 'department':user.Department}), content_type="application/json")
+        else:
+            error=-2
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def add_syndrom(request):
     error=-1

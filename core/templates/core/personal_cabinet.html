@@ -15,13 +15,13 @@
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">{{ user.login }}</h4>
-                <p class="card-text text-dark mx-2">Email: {{ user.email }}</p>
-                <p class="card-text text-dark mx-2">FIO: {{ user.FIO }}</p>
-                <p class="card-text text-dark mx-2">Social Networks: {{ user.SocialNetwork }}</p>
-                <p class="card-text text-dark mx-2">Position: {{ user.Position }}</p>
-                <p class="card-text text-dark mx-2">Department: {{ user.Department }}</p>
+                <p id="name_email" class="card-text text-dark mx-2">Email: {{ user.email }}</p>
+                <p id="name_FIO" class="card-text text-dark mx-2">FIO: {{ user.FIO }}</p>
+                <p id="name_SocialNetwork" class="card-text text-dark mx-2">Social Networks: {{ user.SocialNetwork }}</p>
+                <p id="name_Position" class="card-text text-dark mx-2">Position: {{ user.Position }}</p>
+                <p id="name_Department" class="card-text text-dark mx-2">Department: {{ user.Department }}</p>
 
-                <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change"
+                <a id="person_btn" href="" data-toggle="modal"
                    class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
             </div>
 
@@ -52,8 +52,59 @@
     </form>
 
     <script>
-        url = "{}"
-        $.post(url)
+        $(document).ready(function() {
+
+            $('#id_login').hide();
+
+            //Тут мы только получаем данные для записи (изменение и открытие формы)
+            $(document).delegate('#person_btn', 'click', function() {
+                url_get = "{% url 'get_person' %}";
+                form_name = ".add-form";
+                $.post(url_get, {login: "{{login}}", 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                    if (data.id != -1) {
+                        $(form_name)[0][2]["value"] = "{{login}}";
+                        $(form_name)[0][3]["value"] = data.FIO;
+                        $(form_name)[0][4]["value"] = data.email;
+                        $(form_name)[0][5]["value"] = data.password;
+                        $(form_name)[0][6]["value"] = data.social_network;
+                        $(form_name)[0][7]["value"] = data.position;
+                        $(form_name)[0][8]["value"] = data.department;
+                        $('#change').modal('show');
+                    } else {
+                        alert("Data not recognized");
+                    }
+                });
+            });
+
+
+            // Изменние данных (обработка формы)
+            $('.add-form').submit(function(e) {
+                e.preventDefault();
+                url_update = "{% url 'update_person' %}";
+                datain = $(this).serialize();
+                rowid = $(this)[0][2]["value"];
+                $.post(url_update, datain, function(data) {
+                    if (data.id == "-1") {
+                        alert("Not updated");
+                    } else if (data.id == "-2") {
+                        alert("Not updated");
+                    } else {
+                        document.getElementById("name_FIO").textContent = "FIO: " + data.FIO;
+                        document.getElementById("name_email").textContent = "Email: " + data.email;
+                        document.getElementById("name_SocialNetwork").textContent = "Social Networks: " + data.social_network;
+                        document.getElementById("name_Position").textContent = "Position: " + data.position;
+                        document.getElementById("name_Department").textContent = "Department: " + data.department;
+                        $('#change').modal('hide');
+                    }
+                });
+            });
+
+
+
+        });
+
+        
+
     </script>
 
 

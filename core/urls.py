@@ -97,6 +97,9 @@ urlpatterns = [
     path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
+    path("person/get", views.get_person, name="get_person"),
+    path("person/update", views.update_person, name="update_person"),
+    
 
     path('patient_records/view/<int:id>/<login>', views.view_patient_records, name="view_patient_records"),
     path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>', views.view_treatment, name="view_treatment"),
