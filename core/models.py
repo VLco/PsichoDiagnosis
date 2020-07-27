@@ -62,8 +62,8 @@ class Epicrisis(models.Model):
     Referral = models.CharField(max_length=1000, verbose_name='referral')
     Therapy = models.CharField(max_length=50000, verbose_name='therapy')
     Disability = models.CharField(max_length=1000, verbose_name='disability')
-    Hospitalization = models.DateField(default = "1999-01-01", null=True)
-    HospitalDischarge = models.DateField(default="1999-01-01", null=True)
+    Hospitalization = models.DateField(default =date.today(), null=True)
+    HospitalDischarge = models.DateField(default=date.today(), null=True)
     IsOver = models.IntegerField()
 
     class Meta():
@@ -75,7 +75,7 @@ class Diagnosis(models.Model):
     Treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
     Doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     Name = models.CharField(max_length=1000, verbose_name='name')
-    StartDiagnosis = models.DateField(default = "1999-01-01", null=True)
+    StartDiagnosis = models.DateField(default=date.today(), null=True)
     Note = models.CharField(max_length=50000, verbose_name='note')
 
     class Meta():
@@ -98,19 +98,6 @@ class Diagnos(models.Model):
         return self.Name
 
 
-class Form(models.Model):
-    Diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
-    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
-    Name = models.CharField(max_length=1000, verbose_name='name')
-    DateForm = models.DateField(default = "1999-01-01", null=True)
-    Note = models.CharField(max_length=50000, verbose_name='note')
-    Conviction = models.IntegerField()
-
-    class Meta():
-        verbose_name = 'form'
-        verbose_name_plural = 'forms'
-
-
 class Conviction(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')
     Position = models.IntegerField()
@@ -124,6 +111,20 @@ class Conviction(models.Model):
 
     def __unicode__(self):
         return self.Name
+
+
+class Form(models.Model):
+    Diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
+    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=1000, verbose_name='name')
+    DateForm = models.DateField(default=date.today(), null=True)
+    Note = models.CharField(max_length=50000, verbose_name='note')
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+
+    class Meta():
+        verbose_name = 'form'
+        verbose_name_plural = 'forms'
+
 
 class Frequency(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')

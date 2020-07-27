@@ -295,14 +295,10 @@ class formDiagnosis(forms.Form):
     start_diagnosis.widget.attrs.update({'class': 'form-control'})
 
 class formForm(forms.Form):
-    diagnos = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id" )
     name = forms.CharField()
     dateForm = forms.DateField(required=False)
     note = forms.CharField(required=False)
-    conviction = forms.IntegerField(required=False)
 
-    diagnos.widget.attrs.update({'class': 'form-control'})
     name.widget.attrs.update({'class': 'form-control'})
     note.widget.attrs.update({'class': 'form-control'})
     dateForm.widget.attrs.update({'class': 'form-control'})
-    conviction.widget.attrs.update({'class': 'form-control'})
