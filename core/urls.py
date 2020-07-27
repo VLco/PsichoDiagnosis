@@ -45,6 +45,9 @@ from .views import SingleSelectedSymptomsDoctorView
 from .views import AnamesisView
 from .views import SingleAnamesisView
 
+from .views import MamdaniDocView
+from .views import MamdaniFormView
+
 
 urlpatterns = [
     
@@ -168,4 +171,7 @@ urlpatterns = [
     path('api/anamesis/', AnamesisView.as_view()),
     path('api/anamesis/<int:pk>', AnamesisView.as_view()),
     path('api/single-anamesis/<int:pk>', SingleAnamesisView.as_view()),
+
+    path('api/mamdani/doc-<login>', MamdaniDocView.as_view()),
+    path('api/mamdani/form-<int:pk>', MamdaniFormView.as_view()),
 ]

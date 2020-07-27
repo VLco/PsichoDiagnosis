@@ -1477,19 +1477,13 @@ def update_questdoc(request):
         return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
-def verity_cond(sim, rul):
-    if sim==rul:
-        return 1
-    elif sim+1==rul or sim-1==rul:
-        return 0.6
-    else:
-        return 0
+
 
 def alg_mamdani_up(request):
     login = request.POST.get("login")
     idDoc = Doctor.objects.get(login=login).id
     selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
-    diag_id = alg_mamdani(selectsDoctor)
+    diag_id, conv_id = alg_mamdani(selectsDoctor)
 
     if diag_id == -1:
         # Диагноз не найден
@@ -1497,16 +1491,33 @@ def alg_mamdani_up(request):
     else:
         # Выдаем диагноз
         diag = Diagnos.objects.get(id=diag_id)
-        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name}), content_type="application/json")
+        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name}), content_type="application/json")
 
     # selectDoctor.Symptom
     # selectDoctor.Conviction
 
 
+def verity_conv(sim, rul):
+    if sim==rul:
+        return 1
+    elif sim+1==rul or sim-1==rul:
+        return 0.6
+    else:
+        return 0
+
+def getid_conv(ver):
+    if ver<=0.33:
+        return 1
+    elif ver<=0.66:
+        return 2
+    else:
+        return 3
+
 def alg_mamdani(selectsDoctor):
 
     ver_max=0
     id_max=[]
+    ver_idmax=[]
 
     #Пробегаем по всем правилам
     for rule in Rule.objects.all():
@@ -1522,7 +1533,7 @@ def alg_mamdani(selectsDoctor):
                 if selectDoctor.Symptom.id==rsymti.Symptom.id:
                     include = True
                     includeAll = True
-                    verity_rule.append(verity_cond(selectDoctor.Conviction.Position, rsymti.Conviction.Position))
+                    verity_rule.append(verity_conv(selectDoctor.Conviction.Position, rsymti.Conviction.Position))
             if not include:
                 verity_rule.append(0)
 
@@ -1549,21 +1560,27 @@ def alg_mamdani(selectsDoctor):
             if fin_ver>ver_max:
                 ver_max=fin_ver
                 id_max=[]
+                ver_idmax=[]
                 id_max.append(rule.Diagnos.id)
+                ver_idmax.append(mean_ver)
             elif fin_ver == ver_max:
                 id_max.append(rule.Diagnos.id)
+                ver_idmax.append(mean_ver)
 
     if len(id_max)==0:
         # Диагноз не найден
-        return -1
+        return -1, -1
     elif len(id_max)>1:
         # Выбираем один из
-        diag = Diagnos.objects.get(id_max[random.randint(0, len(id_max)-1)])
-        return diag.id
+        ind = random.randint(0, len(id_max)-1)
+        diag = Diagnos.objects.get(id=id_max[ind])
+        conv =  Conviction.objects.get(Position = getid_conv(ver_idmax[ind]))
+        return diag.id, conv.id
     else:
         # Выдаем диагноз
         diag = Diagnos.objects.get(id=id_max[0])
-        return diag.id
+        conv =  Conviction.objects.get(Position = getid_conv(ver_idmax[0]))
+        return diag.id, conv.id
 
 
 
@@ -2203,3 +2220,33 @@ class SingleAnamesisView(APIView):
         anamesis = get_object_or_404(Anamesis.objects.all(), pk=pk)
         serializer = GetAnamesisSerializer(anamesis)
         return Response({"Anamesis": serializer.data})
+
+#####
+class MamdaniDocView(APIView):
+    def get(self, request, login):
+        idDoc = get_object_or_404(Doctor.objects.all(), login=login).id
+        selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
+        diag_id, conv_id = alg_mamdani(selectsDoctor)
+
+        if diag_id == -1:
+            # Диагноз не найден
+            return HttpResponse({'id': -1})
+        else:
+            # Выдаем диагноз
+            diag = Diagnos.objects.get(id=diag_id)
+            return Response({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name})
+
+class MamdaniFormView(APIView):
+    def get(self, request, pk):
+        selectsDoctor = SelectedSymptoms.objects.filter(Form=pk)
+        diag_id, conv_id = alg_mamdani(selectsDoctor)
+
+        if diag_id == -1:
+            # Диагноз не найден
+            return Response({'id': -1})
+        else:
+            # Выдаем диагноз
+            diag = Diagnos.objects.get(id=diag_id)
+            return Response({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name})
+
+
