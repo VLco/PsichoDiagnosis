@@ -13,16 +13,16 @@
     <div class="container mt-3">
 
         <div class="card">
-            <div class="card-body">
+            <div class="card-body mr-3">
                 <h4 class="card-title">{{ user.login }}</h4>
-                <p id="name_email" class="card-text text-dark mx-2">Email: {{ user.email }}</p>
-                <p id="name_FIO" class="card-text text-dark mx-2">FIO: {{ user.FIO }}</p>
-                <p id="name_SocialNetwork" class="card-text text-dark mx-2">Social Networks: {{ user.SocialNetwork }}</p>
-                <p id="name_Position" class="card-text text-dark mx-2">Position: {{ user.Position }}</p>
-                <p id="name_Department" class="card-text text-dark mx-2">Department: {{ user.Department }}</p>
+                <p id="name_email" class="card-text text-dark mx-2 border-bottom container">Email: {{ user.email }}</p>
+                <p id="name_FIO" class="card-text text-dark mx-2 border-bottom container">FIO: {{ user.FIO }}</p>
+                <p id="name_SocialNetwork" class="card-text text-dark mx-2 border-bottom container">Social Networks: {{ user.SocialNetwork }}</p>
+                <p id="name_Position" class="card-text text-dark mx-2 border-bottom container">Position: {{ user.Position }}</p>
+                <p id="name_Department" class="card-text text-dark mx-2 border-bottom container">Department: {{ user.Department }}</p>
 
                 <a id="person_btn" href="" data-toggle="modal"
-                   class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
+                   class="btn btn-primary btn-xs pull-left add-elem mt-2">Сhange</a>
             </div>
 
 
