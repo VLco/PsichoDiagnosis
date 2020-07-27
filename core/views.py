@@ -25,7 +25,6 @@ from .forms import *
 # Create your views here.
 
 g_login = ''
-g_id = ''
 # ok
 def base_core(request):
     signin_form = SigninForm()
@@ -37,26 +36,31 @@ def base_core(request):
 def sign_in(request):
     if request.method == "POST":
         user = Doctor()
+        if user.Activated == True:
+            fields = {
+                'login': request.POST.get("login"),
+                'password': request.POST.get("password"),
+            }
 
-        fields = {
-            'login': request.POST.get("login"),
-            'password': request.POST.get("password"),
-        }
-
-        if Doctor.objects.all().filter(login=fields['login']):
-            user.login = fields['login']
-            user.password = fields['password']
-            template = 'core/main.html'
-            return render(request, template, {"login": user.login})
+            if Doctor.objects.all().filter(login=fields['login']):
+                user.login = fields['login']
+                user.password = fields['password']
+                template = 'core/main.html'
+                return render(request, template, {"login": user.login})
+            else:
+                signin_form = SigninForm()
+                template = "core/base_core.html"
+                return render(request, template, {"form": signin_form, "message": "Данные введены не корректно"})
+            
         else:
             signin_form = SigninForm()
-            template = "core/base_core.html"
-            return render(request, template, {"form": signin_form, "message": "Данные введены не корректно"})
-            
+            template = "core/sign_in.html"
+            return render(request, template, {"form": signin_form, "message": "Аккаунт не активирован"})
     else:
         signin_form = SigninForm()
-        template = "core/sign_in.html"
+        template = "core/base_core.html"
         return render(request, template, {"form": signin_form})
+        
 
 
 
@@ -85,7 +89,7 @@ def register(request):
         else:
             user.login = fields['login']
             user.password = fields['password']
-            user.isAdmin = False
+            user.Activated = False
             user.save()
             return HttpResponseRedirect('/sign-in/')
     else:
@@ -105,11 +109,13 @@ def main(request):
             'password': request.POST.get("password"),
         }
 
-        if Doctor.objects.all().filter(login=fields['login'], password=fields['password']):
+        if Doctor.objects.all().filter(login=fields['login'], password=fields['password'],Activated = False):
+            signin_form = SigninForm()
+            template = "core/base_core.html"
+            return render(request, template, {"form": signin_form, "message": "Account not activated"})
+        if Doctor.objects.all().filter(login=fields['login'], password=fields['password'], Activated = True):
             template = 'core/main.html'
             return HttpResponseRedirect(reverse("patient_records", args=[fields['login']]))
-            #return render(request, template, {"login": fields["login"]})
-
         else:
             signin_form = SigninForm()
             template = "core/base_core.html"
