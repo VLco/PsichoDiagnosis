@@ -176,7 +176,9 @@
                     $.post(url_add, datain, function(data) {
                     if(data.id == "-1"){
                         alert("Line not added");
-                    }else {
+                    } else if(data.id == "-2"){
+                        alert("Line not added, symptom exists");
+                    } else {
                         var rData = [
                             data.sym,
                             data.conv,
@@ -200,6 +202,8 @@
                     $.post(url_update, datain, function(data) {
                     if(data.id == "-1"){
                         alert("The line is not changed");
+                    }else if(data.id == "-2"){
+                        alert("Line not changed, symptom exists");
                     } else {
                         var rData = [
                             data.sym,

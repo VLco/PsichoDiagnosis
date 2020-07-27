@@ -1353,13 +1353,17 @@ def add_symrule(request):
         idRul= request.POST.get("idSRuleRule")
         idSym = request.POST.get("idSymRule")
         idConv = request.POST.get("idConvRule")
-        ruleSymptom = RuleSymptom()
-        ruleSymptom.Rule = Rule.objects.get(id=idRul)
-        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
-        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
-        ruleSymptom.save()
-        error=ruleSymptom.id
-        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        if not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
+            ruleSymptom = RuleSymptom()
+            ruleSymptom.Rule = Rule.objects.get(id=idRul)
+            ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+            ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+            ruleSymptom.save()
+            error=ruleSymptom.id
+            return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        else:
+            error=-2
+
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def get_symrule(request):
@@ -1378,13 +1382,16 @@ def update_symrule(request):
         idRul= request.POST.get("idSRuleRule")
         idSym = request.POST.get("idSymRule")
         idConv = request.POST.get("idConvRule")
-        ruleSymptom = RuleSymptom.objects.get(id=id)
-        ruleSymptom.Rule = Rule.objects.get(id=idRul)
-        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
-        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
-        ruleSymptom.save()
-        error=ruleSymptom.id
-        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        if not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
+            ruleSymptom = RuleSymptom.objects.get(id=id)
+            ruleSymptom.Rule = Rule.objects.get(id=idRul)
+            ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+            ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+            ruleSymptom.save()
+            error=ruleSymptom.id
+            return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def update_syndrom(request):
@@ -1427,15 +1434,17 @@ def add_questdoc(request):
         logDoc= request.POST.get("logDoc")
         idDoc = Doctor.objects.get(login=logDoc).id
         note= request.POST.get("note")
-
-        selectDoctor = SelectedSymptomsDoctor()
-        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
-        selectDoctor.Symptom=Symptom.objects.get(id=idSym)
-        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
-        selectDoctor.Note=note
-        selectDoctor.save()
-        error=selectDoctor.id
-        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        if not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
+            selectDoctor = SelectedSymptomsDoctor()
+            selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+            selectDoctor.Symptom=Symptom.objects.get(id=idSym)
+            selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+            selectDoctor.Note=note
+            selectDoctor.save()
+            error=selectDoctor.id
+            return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def delete_questdoc(request):
@@ -1476,15 +1485,17 @@ def update_questdoc(request):
         logDoc= request.POST.get("uqlogDoc")
         idDoc = Doctor.objects.all().get(login=logDoc).id
         note= request.POST.get("uqnote")
-
-        selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
-        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
-        selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
-        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
-        selectDoctor.Note=note
-        selectDoctor.save()
-        error=selectDoctor.id
-        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        if not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
+            selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
+            selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+            selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
+            selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+            selectDoctor.Note=note
+            selectDoctor.save()
+            error=selectDoctor.id
+            return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 
