@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<form method="POST">
+<form action="{% url 'main' %}" method="POST">
 
 {% csrf_token %}
 

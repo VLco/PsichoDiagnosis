@@ -1079,6 +1079,8 @@ def delete_syndrom(request):
             Rule.objects.all().filter(id=id).delete()
             error=0
     return HttpResponse(error)
+
+
 def patient_records(request,login):
     records = PatientRecord.objects.all()
     global g_login
@@ -1161,8 +1163,8 @@ def get_patient_records(request):
 
 def view_patient_records(request, id, login):
     user = Doctor.objects.get(login=login)
-    patient = PatientRecord.objects.get(NumberRecord=id)
-    treatment = Treatment.objects.filter(Record=patient)
+    patient = PatientRecord.objects.get(id=id)
+    treatment = Treatment.objects.filter(Record=patient.id)
     if request.method != "POST":
         form = formTreatment()
     if request.method == "POST":
@@ -1176,13 +1178,13 @@ def view_patient_records(request, id, login):
             if tr.Date is request.POST.get('date', False):
                 tr.Date = request.POST.get('date')
             tr.save()
-            return HttpResponseRedirect(reverse("view_patient_records", args=[patient.NumberRecord, user.login]))
+            return HttpResponseRedirect(reverse("view_patient_records", args=[patient.id, user.login]))
     context = {
         'login': login,
         'patient': patient,
         'user': user,
         'formTreatment': form,
-        "listT": treatment
+        "listTre": treatment
     }
     template = "core/view_patient.html"
     return render(request, template, context)
@@ -1191,7 +1193,7 @@ def view_patient_records(request, id, login):
 
 def view_treatment(request, id_p, login, id_tr):
     user = Doctor.objects.get(login=login)
-    patient = PatientRecord.objects.get(NumberRecord=id_p)
+    patient = PatientRecord.objects.get(id=id_p)
     treatment = Treatment.objects.get(id=id_tr)
     diag = Diagnosis.objects.filter(Treatment=treatment)
     if request.method != "POST":
@@ -1207,7 +1209,7 @@ def view_treatment(request, id_p, login, id_tr):
             if di.StartDiagnosis is request.POST.get('date', False):
                 di.StartDiagnosis = request.POST.get('date')
             di.save()
-            return HttpResponseRedirect(reverse("view_treatment", args=[patient.NumberRecord, user.login, treatment.id]))
+            return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
     context = {
         'login': login,
         'patient': patient,
@@ -1223,7 +1225,7 @@ def view_treatment(request, id_p, login, id_tr):
 
 def view_diagnosis(request, id_p, login, id_tr, id_d):
     user = Doctor.objects.get(login=login)
-    patient = PatientRecord.objects.get(NumberRecord=id_p)
+    patient = PatientRecord.objects.get(id=id_p)
     treatment = Treatment.objects.get(id=id_tr)
     diag = Diagnosis.objects.get(id=id_d)
     listForm = Form.objects.filter(Diagnosis=diag)
@@ -1237,12 +1239,12 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
             f.Diagnos = Diagnos.objects.get(id=request.POST.get('diagnos'))
             f.Name = request.POST.get('name')
             f.Note = request.POST.get('note')
-            f.Conviction = request.POST.get('conviction')
+            f.Conviction = 0
             if f.DateForm is request.POST.get('dateForm', False):
                 f.StartDiagnosis = request.POST.get('dateForm')
             f.save()
             return HttpResponseRedirect(
-                reverse("view_diagnosis", args=[patient.NumberRecord, user.login, treatment.id, diag.id]))
+                reverse("view_diagnosis", args=[patient.id, user.login, treatment.id, diag.id]))
     context = {
         'login': login,
         'patient': patient,
@@ -1451,7 +1453,7 @@ def get_questdoc(request):
         id = request.POST.get("id")
         if SelectedSymptomsDoctor.objects.all().filter(id=id):
             relsym = SelectedSymptomsDoctor.objects.get(id=id)
-            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note}), content_type="application/json")
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note, 'namesym':relsym.Symptom.Name, 'nameconv':relsym.Conviction.Name}), content_type="application/json")
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def update_questdoc(request):

@@ -40,25 +40,25 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for treatment in listT %}
+                            {% for treatment in listTre %}
                                 <tr>
                                     <td>{{ treatment.Doctor }}</td>
                                     <td>{{ treatment.Name }}</td>
                                     <td>{{ treatment.Note }}</td>
                                     <td>{{ treatment.Date }}</td>
                                     <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record"
+                                        <button type="button" rel="tooltip" data-id="{{ patient.id }}" data-db="record"
                                                 class="btn btn-success btn-just-icon btn-sm update"
                                                 data-original-title="" title="">
                                             <i class="material-icons">edit</i>
                                         </button>
-                                        <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record"
+                                        <button type="button" rel="tooltip" data-id="{{ patient.id }}" data-db="record"
                                                 class="btn btn-danger btn-just-icon btn-sm delete mr-3"
                                                 data-original-title="" title="">
                                             <i class="material-icons">close</i>
                                         </button>
                                         <a class="btn btn-info btn-just-icon btn-sm"
-                                           href="{% url "view_treatment" treatment.id user.login treatment.id %}">
+                                           href="{% url 'view_treatment' patient.id user.login treatment.id %}">
                                             <i class="material-icons">person</i>
                                         </a>
                                     </td>
@@ -88,7 +88,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        {% csrf_token %} {{ formTreatment }}
+                        {% csrf_token %} 
+                        {{ formTreatment }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

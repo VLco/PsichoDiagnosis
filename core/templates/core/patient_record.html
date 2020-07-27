@@ -40,14 +40,14 @@
                                 <td>{{ record.Phone }}</td>
                                 <td class="td-actions text-right">
                                     <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-success btn-just-icon btn-sm update" data-original-title="" title="">
-                                    <i class="material-icons">edit</i>
-                                </button>
-                                    <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-danger btn-just-icon btn-sm delete mr-3" data-original-title="" title="">
-                                    <i class="material-icons">close</i>
-                                </button>
-                                    <a class="btn btn-info btn-just-icon btn-sm" href="{% url "view_patient_records" record.id login %}">
-                                    <i class="material-icons">person</i>
-                                </a>
+                                        <i class="material-icons">edit</i>
+                                    </button>
+                                    <button type="button" rel="tooltip" data-id="{{ record.id }}" data-db="record" class="btn btn-danger btn-just-icon btn-sm delete" data-original-title="" title="">
+                                        <i class="material-icons">close</i>
+                                    </button>
+                                    <a class="btn btn-info btn-just-icon btn-sm mr-3" href="{% url 'view_patient_records' record.id login %}">
+                                        <i class="material-icons">person</i>
+                                    </a>
                                 </td>
                             </tr>
 
@@ -211,7 +211,6 @@
             datain = $(this).serialize();
             if (url_add != "") {
                 if (iddb == "") {
-                    alert(iddb);
                     $.post(url_add, datain, function(data) {
                         if (data == "-1") {
                             alert("Строка не добавлена");
@@ -232,7 +231,7 @@
                                 '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
                                 '<i class="material-icons">close</i>' +
                                 '</button>' +
-                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm ml-1" data-original-title="" title="">' +
                                 '<i class="material-icons">person</i>' +
                                 '</button>' +
                                 '</div>'

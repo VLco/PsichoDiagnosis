@@ -192,9 +192,9 @@ class SymptomesForm(forms.Form):
 class PatientsForm(forms.Form):
     idRowPatient= forms.IntegerField(required='', label="")
     idPatient = forms.IntegerField(required='', label="")
-    number_card = forms.CharField(required='', max_length=50, label="number card")
-    FIO = forms.CharField(required='', max_length=100, label="First last middle name")
-    date_birth = forms.CharField(required='', label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
+    number_card = forms.CharField(max_length=50, label="number card")
+    FIO = forms.CharField(max_length=100, label="First last middle name")
+    date_birth = forms.CharField(label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
     sex = forms.CharField(required='', max_length=50, label="sex")
     address = forms.CharField(required='', max_length=100, label="adress")
     phone = forms.CharField(required='', max_length=50, label="phons")
@@ -298,8 +298,8 @@ class formForm(forms.Form):
     diagnos = forms.ModelChoiceField(queryset=Diagnos.objects.all(), to_field_name="id" )
     name = forms.CharField()
     dateForm = forms.DateField(required=False)
-    note = forms.CharField()
-    conviction = forms.IntegerField()
+    note = forms.CharField(required=False)
+    conviction = forms.IntegerField(required=False)
 
     diagnos.widget.attrs.update({'class': 'form-control'})
     name.widget.attrs.update({'class': 'form-control'})

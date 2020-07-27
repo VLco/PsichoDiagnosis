@@ -95,9 +95,9 @@ urlpatterns = [
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
 
-    path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
-    path('patient_records/view/<id_p>/<login>/treatment=<id_tr>', views.view_treatment, name="view_treatment"),
-    path('patient_records/view/<id_p>/<login>/treatment=<id_tr>/diagnosis=<id_d>', views.view_diagnosis, name="view_diagnosis"),
+    path('patient_records/view/<int:id>/<login>', views.view_patient_records, name="view_patient_records"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>', views.view_treatment, name="view_treatment"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/diagnosis-<int:id_d>', views.view_diagnosis, name="view_diagnosis"),
 
     path('symrule/delete/', views.delete_symrule, name="delete_symrule"),
     path('symrule/add/', views.add_symrule, name="add_symrule"),

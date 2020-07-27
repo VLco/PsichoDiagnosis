@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'iswork.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',#postgresql_psycopg2',
-        'NAME': 'qwsed',
+        'NAME': 'qwerfdsa',
         'USER': 'vseva',
         'PASSWORD': 'qwerty', 
         'HOST': 'localhost',#'127.0.0.1',
