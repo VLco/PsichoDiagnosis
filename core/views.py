@@ -1447,6 +1447,16 @@ def delete_questdoc(request):
             error=0
     return HttpResponse(error)
 
+
+def deleteall_questdoc(request):
+    error=1
+    if request.method == "POST":
+        login = request.POST.get("login")
+        if SelectedSymptomsDoctor.objects.all().filter(Doctor=Doctor.objects.get(login=login).id):
+            SelectedSymptomsDoctor.objects.all().filter(Doctor=Doctor.objects.get(login=login).id).delete()
+            error=0
+    return HttpResponse(error)
+
 def get_questdoc(request):
     error=-1
     if request.method == "POST":

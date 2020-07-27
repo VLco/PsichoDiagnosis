@@ -31,7 +31,11 @@
                         <h5 id="diagnos_get" class="text-primary jumbotron-heading"></h5>
                         <h5 id="conviction_get" class="ml-2 text-primary jumbotron-heading"></h5>
                     </div>
-                    <a id="symptom_btn" href="#"  class="btn btn-primary btn-xs pull-left">Get Diagnos</a>
+                    <div>
+                        <a id="del_symptom_btn" href="#"  class="btn btn-danger btn-xs pull-left mr-3">Remove All</a>
+                        <a id="symptom_btn" href="#"  class="btn btn-primary btn-xs pull-left">Get Diagnos</a>
+                    </div>
+                    
                 </div>
 
                 <tr>
@@ -252,16 +256,31 @@
                     document.getElementById('diagnos_get').textContent="Diagnosis: Not found";
                     document.getElementById('conviction_get').textContent="Conviction: Not found";
                 }
-                
-                // if(data == "0"){
-                //     var oTable = $(table_name).dataTable();
-                //     oTable.fnDeleteRow(oTable.fnGetPosition(row));
-                // }
-                // else {
-                //     alert("Строка не удалена");
-                // }
+
             }); 
         });
+
+        //Удаление всех симптомов
+        $(document).delegate('#del_symptom_btn', 'click', function() {
+            login="{{login}}";
+            url="{% url 'deleteall_questdoc' %}"
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                $.post(url, {login:login, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                    if(data == "0"){
+                        table_name= "#symptom_table";
+                        document.getElementById('diagnos_get').textContent="";
+                        document.getElementById('conviction_get').textContent="";
+                        var oTable = $(table_name).dataTable();
+                        oTable.fnDeleteRow();
+                    } else{
+                        alert("Line not deleted");
+                    }
+                }); 
+            }
+        });
+
+        
 
         // Удаление элемента из таблицы
         $(document).delegate('.delete', 'click', function() { 
@@ -278,7 +297,7 @@
                     $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
                         if(data == "0"){
                             var oTable = $(table_name).dataTable();
-                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                            oTable.fnDeleteRow(oTable.fnGetPosition(row));
                         }
                         else {
                             alert("Line not deleted");

@@ -110,6 +110,7 @@ urlpatterns = [
     path('questionary/doc-<login>/', views.questionary, name="questionary"),
     path('questdoc/add/', views.add_questdoc, name="add_questdoc"),
     path('questdoc/delete/', views.delete_questdoc, name="delete_questdoc"),
+    path('questdoc/deleteall/', views.deleteall_questdoc, name="deleteall_questdoc"),
     path('questdoc/get/', views.get_questdoc, name="get_questdoc"),
     path('questdoc/update/', views.update_questdoc, name="update_questdoc"),
 
