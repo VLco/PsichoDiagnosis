@@ -195,7 +195,7 @@ class PatientsForm(forms.Form):
     number_card = forms.CharField(max_length=50, label="number card")
     FIO = forms.CharField(max_length=100, label="First last middle name")
     date_birth = forms.CharField(label='birthday', widget=forms.TextInput(attrs={'placeholder': 'Please use the following format: YYYY-MM-DD'}))
-    sex = forms.CharField(required='', max_length=50, label="sex")
+    sex = forms.ChoiceField(choices=[('M', 'Man'),('W', 'Woman')], label="sex")
     address = forms.CharField(required='', max_length=100, label="adress")
     phone = forms.CharField(required='', max_length=50, label="phons")
 

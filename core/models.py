@@ -6,7 +6,7 @@ class PatientRecord(models.Model):
     NumberRecord = models.CharField(max_length=200, verbose_name='number record')
     FIO = models.CharField(max_length=200, verbose_name='FIO')
     Birthday = models.DateField(default = "1999-01-01", null=True)
-    Sex = models.CharField(max_length=200, verbose_name='sex')
+    Sex = models.CharField(choices=[('M', 'Man'),('W', 'Woman')], max_length=200, verbose_name='sex')
     Adress = models.CharField(max_length=200, verbose_name='adress')
     Phone = models.CharField(max_length=50, verbose_name='phone')
 
