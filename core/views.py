@@ -1164,7 +1164,7 @@ def get_patient_records(request):
 def view_patient_records(request, id, login):
     user = Doctor.objects.get(login=login)
     patient = PatientRecord.objects.get(id=id)
-    treatment = Treatment.objects.filter(Record=patient.id)
+    treatment = Treatment.objects.filter(Record=patient)
     if request.method != "POST":
         form = formTreatment()
     if request.method == "POST":
