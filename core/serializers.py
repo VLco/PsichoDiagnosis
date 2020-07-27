@@ -201,45 +201,6 @@ class DiagnosSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-
-#####
-class GetFormSerializer(serializers.Serializer):
-    id = serializers.IntegerField(required=False)
-    Diagnosis = GetDiagnosisSerializer()
-    Diagnos = DiagnosSerializer()
-
-    Name = serializers.CharField(max_length=1000, required=False)
-    DateForm = serializers.DateField(default = "1999-01-01", required=False)
-    Note = serializers.CharField(max_length=50000, required=False)
-    Conviction = serializers.IntegerField(default = 0, required=False)
-
-class SetFormSerializer(serializers.Serializer):
-    Diagnosis = serializers.IntegerField(source='Diagnosis.id')
-    Diagnos = serializers.IntegerField(source='Diagnos.id')
-
-    Name = serializers.CharField(max_length=1000, required=False)
-    DateForm = serializers.DateField(default = "1999-01-01", required=False)
-    Note = serializers.CharField(max_length=50000, required=False)
-    Conviction = serializers.IntegerField(default = 0, required=False)
-
-    def create(self, validated_data):
-        diagnosis = validated_data.pop('Diagnosis')
-        diagnos = validated_data.pop('Diagnos')
-        form = Form.objects.create(Diagnosis=Diagnosis.objects.get(id=diagnosis['id']), Diagnos=Diagnos.objects.get(id=diagnos['id']),**validated_data)
-        return form
-    
-    def update(self, instance, validated_data):
-        instance.Diagnosis = Diagnosis.objects.get(id=validated_data.get('Diagnosis', instance.Diagnosis)['id'])
-        instance.Diagnos = Diagnos.objects.get(id=validated_data.get('Diagnos', instance.Diagnos)['id'])
-        
-        instance.Name = validated_data.get('Name', instance.Name)
-        instance.DateForm = validated_data.get('DateForm', instance.DateForm)
-        instance.Note = validated_data.get('Note', instance.Note)
-        instance.Conviction = validated_data.get('Conviction', instance.Conviction)
-
-        instance.save()
-        return instance
-
 #####
 class ConvictionSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
@@ -251,6 +212,46 @@ class FrequencySerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     Name = serializers.CharField(max_length=1000)
     Coef = serializers.FloatField()
+
+
+#####
+class GetFormSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    Diagnosis = GetDiagnosisSerializer()
+    Diagnos = DiagnosSerializer()
+    Conviction = ConvictionSerializer()
+
+    Name = serializers.CharField(max_length=1000, required=False)
+    DateForm = serializers.DateField(default = "1999-01-01", required=False)
+    Note = serializers.CharField(max_length=50000, required=False)
+
+class SetFormSerializer(serializers.Serializer):
+    Diagnosis = serializers.IntegerField(source='Diagnosis.id')
+    Diagnos = serializers.IntegerField(source='Diagnos.id')
+    Conviction = serializers.IntegerField(source='Conviction.id', required=False)
+
+    Name = serializers.CharField(max_length=1000, required=False)
+    DateForm = serializers.DateField(default = "1999-01-01", required=False)
+    Note = serializers.CharField(max_length=50000, required=False)
+
+    def create(self, validated_data):
+        diagnosis = validated_data.pop('Diagnosis')
+        diagnos = validated_data.pop('Diagnos')
+        form = Form.objects.create(Diagnosis=Diagnosis.objects.get(id=diagnosis['id']), Diagnos=Diagnos.objects.get(id=diagnos['id']),**validated_data)
+        return form
+    
+    def update(self, instance, validated_data):
+        instance.Diagnosis = Diagnosis.objects.get(id=validated_data.get('Diagnosis', instance.Diagnosis)['id'])
+        instance.Diagnos = Diagnos.objects.get(id=validated_data.get('Diagnos', instance.Diagnos)['id'])
+
+        instance.Name = validated_data.get('Name', instance.Name)
+        instance.DateForm = validated_data.get('DateForm', instance.DateForm)
+        instance.Note = validated_data.get('Note', instance.Note)
+
+        instance.save()
+        return instance
+
+
 
 
 
