@@ -29,10 +29,10 @@
                             <tr>
                                 <a id="form_btn" href="" data-toggle="modal" data-target="#add_form"
                                    class="btn btn-primary btn-xs pull-left add-elem">Add new form</a>
-                                <th>Diagnos</th>
                                 <th>Name</th>
                                 <th>Date form</th>
                                 <th>Note</th>
+                                <th>Diagnos</th>
                                 <th>Conviction</th>
                                 <th class="text-right">Actions</th>
                             </tr>
@@ -40,23 +40,21 @@
                             <tbody>
                             {% for form in listForm %}
                                 <tr>
-                                    <td>{{ form.Diagnos}}</td>
                                     <td>{{ form.Name }}</td>
                                     <td>{{ form.DateForm }}</td>
                                     <td>{{ form.Note }}</td>
+                                    <td>{{ form.Diagnos }}</td>
                                     <td>{{ form.Conviction }}</td>
 
                                     <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" data-id="{{ form.id }}" data-db="record"
-                                                class="btn btn-success btn-just-icon btn-sm update"
-                                                data-original-title="" title="">
-                                            <i class="material-icons">edit</i>
-                                        </button>
-                                        <button type="button" rel="tooltip" data-id="{{ form.id }}" data-db="record"
-                                                class="btn btn-danger btn-just-icon btn-sm delete mr-3"
-                                                data-original-title="" title="">
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-3"
+                                            href="{% url 'delete_form' login form.id %}">
                                             <i class="material-icons">close</i>
-                                        </button>
+                                        </a>
+                                        <a class="btn btn-success btn-just-icon btn-sm update"
+                                            href="{% url 'view_form' patient.id user.login treatment.id diagnosis.id form.id %}">
+                                            <i class="material-icons">edit</i>
+                                        </a>
 
                                     </td>
                                 </tr>

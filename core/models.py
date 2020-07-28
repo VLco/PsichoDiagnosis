@@ -116,9 +116,9 @@ class Conviction(models.Model):
 
 class Form(models.Model):
     Diagnosis = models.ForeignKey(Diagnosis, on_delete=models.CASCADE)
-    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE)
+    Diagnos = models.ForeignKey(Diagnos, on_delete=models.CASCADE, null=True)
     Name = models.CharField(max_length=1000, verbose_name='name')
-    DateForm = models.DateField(default=date.today(), null=True)
+    DateForm = models.DateField(default=date.today())
     Note = models.CharField(max_length=50000, verbose_name='note')
     Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE, null=True)
 

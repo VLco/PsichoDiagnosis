@@ -1314,17 +1314,17 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
     else:
         formAdd = formForm(request.POST)
         if formAdd.is_valid():
-            f = Form()
-            f.Diagnosis = diag
-            f.Diagnos = Diagnos.objects.get(id=request.POST.get('diagnos'))
-            f.Name = request.POST.get('name')
-            f.Note = request.POST.get('note')
-            f.Conviction = 0
-            if f.DateForm is request.POST.get('dateForm', False):
-                f.StartDiagnosis = request.POST.get('dateForm')
-            f.save()
-            return HttpResponseRedirect(
-                reverse("view_diagnosis", args=[patient.id, user.login, treatment.id, diag.id]))
+            if not Form.objects.filter(Name=request.POST.get('name'), Note=request.POST.get('name'), Diagnosis=diag).exists():
+                f = Form()
+                f.Diagnosis = diag
+                f.Name = request.POST.get('name')
+                f.Note = request.POST.get('note')
+                if f.DateForm is request.POST.get('dateForm', False):
+                    f.DateForm = request.POST.get('dateForm')
+                f.save()
+                return HttpResponseRedirect(
+                    reverse("view_form", args=[patient.id, user.login, treatment.id, diag.id, f.id]))
+
     context = {
         'login': login,
         'patient': patient,
@@ -1337,6 +1337,43 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
     template = "core/view_diagnosis.html"
     return render(request, template, context)
     pass
+
+
+def delete_form(request, login, id_entry):
+    form = Form.objects.get(id=id_entry)
+    diagnosis = form.Diagnosis
+    treatment = diagnosis.Treatment
+    patient = treatment.Record
+    form.delete()
+    return HttpResponseRedirect(reverse("view_diagnosis", args=[patient.id, login, treatment.id, diagnosis.id]))
+    pass
+
+
+def view_form(request, id_p, login, id_tr, id_d, id_f):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(id=id_p)
+    treatment = Treatment.objects.get(id=id_tr)
+    diag = Diagnosis.objects.get(id=id_d)
+    form = Form.objects.get(id=id_f)
+    symptomes = SelectedSymptoms.objects.filter(Form=form.id)
+    formS = FormSymptomForm()
+    uformS = uFormSymptomForm()
+    context = {
+        'login': login,
+        'patient': patient,
+        'user': user,
+        'diagnosis': diag,
+        "treatment": treatment,
+        "form": form,
+        "formS": formS,
+        "uformS": uformS,
+        'symptomes': symptomes,
+    }
+    template = "core/view_form.html"
+    return render(request, template, context)
+    pass
+
+
 
 #####
 #Персона
@@ -1581,6 +1618,79 @@ def update_questdoc(request):
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 
+def add_questForm(request):
+    error=-1
+
+    if request.method == "POST":
+        idSym = request.POST.get("idSym")
+        idConv = request.POST.get("idConv")
+        idForm = request.POST.get("idForm")
+        note = request.POST.get("note")
+        if not SelectedSymptoms.objects.all().filter(Symptom=idSym, Form=idForm):
+            selectS = SelectedSymptoms()
+            selectS.Form = Form.objects.get(id=idForm)
+            selectS.Symptom=Symptom.objects.get(id=idSym)
+            selectS.Conviction=Conviction.objects.get(id=idConv)
+            selectS.Note=note
+            selectS.save()
+            error=selectS.id
+            return HttpResponse(json.dumps({'id': error, 'sym':selectS.Symptom.Name, 'conv':selectS.Conviction.Name, 'note':selectS.Note}), content_type="application/json")
+        else:
+            error=-2
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def delete_questForm(request):
+    error=1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if SelectedSymptoms.objects.all().filter(id=id):
+            SelectedSymptoms.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+
+def deleteall_questForm(request):
+    error=1
+    if request.method == "POST":
+        idForm = request.POST.get("idForm")
+        if SelectedSymptoms.objects.all().filter(Form=Form.objects.get(id=idForm)):
+            SelectedSymptoms.objects.all().filter(Form=Form.objects.get(id=idForm)).delete()
+            error=0
+    return HttpResponse(error)
+
+def get_questForm(request):
+    error=-1
+    if request.method == "POST":
+        id = request.POST.get("id")
+        if SelectedSymptoms.objects.all().filter(id=id):
+            relsym = SelectedSymptoms.objects.get(id=id)
+            return HttpResponse(json.dumps({'id': relsym.id, 'sym':relsym.Symptom.id, 'conv':relsym.Conviction.id, 'note':relsym.Note, 'namesym':relsym.Symptom.Name, 'nameconv':relsym.Conviction.Name}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+def update_questForm(request):
+    error=-1
+
+    if request.method == "POST":
+        id = request.POST.get("uqidSymId")
+        idSym = request.POST.get("uqidSym")
+        idConv = request.POST.get("uqidConv")
+        idForm= request.POST.get("uqidForm")
+        note= request.POST.get("uqnote")
+        if not SelectedSymptoms.objects.all().filter(Symptom=idSym, Form=idForm):
+            select = SelectedSymptoms.objects.get(id=id)
+            select.Form = Form.objects.get(id=idForm)
+            select.Symptom=Symptom.objects.all().get(id=idSym)
+            select.Conviction=Conviction.objects.get(id=idConv)
+            select.Note=note
+            select.save()
+            error=select.id
+            return HttpResponse(json.dumps({'id': error, 'sym':select.Symptom.Name, 'conv':select.Conviction.Name, 'note':select.Note}), content_type="application/json")
+        else:
+            error=-2
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
+
+
+
 
 def alg_mamdani_up(request):
     login = request.POST.get("login")
@@ -1598,6 +1708,27 @@ def alg_mamdani_up(request):
 
     # selectDoctor.Symptom
     # selectDoctor.Conviction
+
+def alg_mamdani_upForm(request):
+    idForm = request.POST.get("idForm")
+    selects = SelectedSymptoms.objects.filter(Form_id=idForm)
+    diag_id, conv_id = alg_mamdani(selects)
+
+    if diag_id == -1:
+        # Диагноз не найден
+        return HttpResponse(json.dumps({'id': -1}), content_type="application/json")
+    else:
+        # Выдаем диагноз
+        diag = Diagnos.objects.get(id=diag_id)
+        form = Form.objects.get(id=idForm)
+        form.Diagnos = diag
+        form.Conviction = Conviction.objects.get(id=conv_id)
+        form.save()
+        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name}), content_type="application/json")
+
+    # selectDoctor.Symptom
+    # selectDoctor.Conviction
+
 
 
 def verity_conv(sim, rul):
@@ -2350,6 +2481,10 @@ class MamdaniFormView(APIView):
         else:
             # Выдаем диагноз
             diag = Diagnos.objects.get(id=diag_id)
+            form = Form.objects.get(id=pk)
+            form.Diagnos = diag
+            form.Conviction = Conviction.objects.get(id=conv_id)
+            form.save()
             return Response({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name})
 
 

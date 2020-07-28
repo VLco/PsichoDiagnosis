@@ -324,3 +324,28 @@ class formEpicrisis(forms.Form):
     hospitalization.widget.attrs.update({'class': 'form-control'})
     hospitalDischarge.widget.attrs.update({'class': 'form-control'})
     is_over.widget.attrs.update({'class': 'form-control'})
+
+
+class FormSymptomForm(forms.Form):
+    idSymRow= forms.IntegerField(required='', label="")
+    idSymId= forms.IntegerField(required='', label="")
+    idForm = forms.IntegerField(required='', label="")
+    idSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptom")
+    idConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="conviction")
+    note = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptom")
+
+    idSym.widget.attrs.update({'class': 'form-control'})
+    idConv.widget.attrs.update({'class': 'form-control'})
+    note.widget.attrs.update({'class': 'form-control'})
+
+class uFormSymptomForm(forms.Form):
+    uqidSymRow= forms.IntegerField(required='', label="")
+    uqidSymId= forms.IntegerField(required='', label="")
+    uqidForm = forms.IntegerField(required='', label="")
+    uqidSym = forms.ModelChoiceField(queryset=Symptom.objects.all(), to_field_name="id", label="symptoms")
+    uqidConv = forms.ModelChoiceField(queryset=Conviction.objects.all(), to_field_name="id", label="convictions")
+    uqnote = forms.CharField(required='',max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="description symptoms")
+
+    uqidSym.widget.attrs.update({'class': 'form-control'})
+    uqidConv.widget.attrs.update({'class': 'form-control'})
+    uqnote.widget.attrs.update({'class': 'form-control'})

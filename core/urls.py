@@ -57,6 +57,10 @@ urlpatterns = [
     path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/del=<int:id_entry>', views.delete_diagnosis, name="delete_diagnosis"),
     path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/diagnosis-<int:id_d>', views.view_diagnosis,
          name="view_diagnosis"),
+    path('form/<login>/del=<int:id_entry>', views.delete_form,
+         name="delete_form"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/diagnosis-<int:id_d>/form-<int:id_f>', views.view_form,
+         name="view_form"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
     path("person/get", views.get_person, name="get_person"),
@@ -75,7 +79,14 @@ urlpatterns = [
     path('questdoc/get/', views.get_questdoc, name="get_questdoc"),
     path('questdoc/update/', views.update_questdoc, name="update_questdoc"),
 
+    path('questForm/add/', views.add_questForm, name="add_questForm"),
+    path('questForm/delete/', views.delete_questForm, name="delete_questForm"),
+    path('questForm/deleteall/', views.deleteall_questForm, name="deleteall_questForm"),
+    path('questForm/get/', views.get_questForm, name="get_questForm"),
+    path('questForm/update/', views.update_questForm, name="update_questForm"),
+
     path('mamdani/', views.alg_mamdani_up, name="alg_mamdani_up"),
+    path('mamdani/form/', views.alg_mamdani_upForm, name="alg_mamdani_upForm"),
 
 
 
