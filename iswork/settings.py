@@ -80,9 +80,9 @@ WSGI_APPLICATION = 'iswork.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',#postgresql_psycopg2',
-        'NAME': 'Med',
+        'NAME': 'psyscan',
         'USER': 'postgres',
-        'PASSWORD': 'maxim1999',
+        'PASSWORD': '123',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }

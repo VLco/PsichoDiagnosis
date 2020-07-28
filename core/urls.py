@@ -51,17 +51,17 @@ urlpatterns = [
     path('patient_records/update/', views.update_patient_records, name="update_patient_records"),
     path('patient_records/get/', views.get_patient_records, name="get_patient_records"),
 
-    path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
+    path('patient_records/view/<int:id>/<login>', views.view_patient_records, name="view_patient_records"),
     path('patient_records/view/<id>/<login>/del=<int:id_entry>', views.delete_treatment, name="delete_treatment"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>', views.view_treatment, name="view_treatment"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/del=<int:id_entry>', views.delete_diagnosis, name="delete_diagnosis"),
+    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/diagnosis-<int:id_d>', views.view_diagnosis,
+         name="view_diagnosis"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
     path("person/get", views.get_person, name="get_person"),
     path("person/update", views.update_person, name="update_person"),
 
-
-    path('patient_records/view/<int:id>/<login>', views.view_patient_records, name="view_patient_records"),
-    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>', views.view_treatment, name="view_treatment"),
-    path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>/diagnosis-<int:id_d>', views.view_diagnosis, name="view_diagnosis"),
 
     path('symrule/delete/', views.delete_symrule, name="delete_symrule"),
     path('symrule/add/', views.add_symrule, name="add_symrule"),

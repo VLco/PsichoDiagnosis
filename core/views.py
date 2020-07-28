@@ -1294,6 +1294,14 @@ def view_treatment(request, id_p, login, id_tr):
     return render(request, template, context)
     pass
 
+def delete_diagnosis(request, id_p, login, id_tr,  id_entry):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(id=id_p)
+    treatment = Treatment.objects.get(id=id_tr)
+    diagnosis = Diagnosis.objects.get(id=id_entry)
+    diagnosis.delete()
+    return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
+    pass
 
 def view_diagnosis(request, id_p, login, id_tr, id_d):
     user = Doctor.objects.get(login=login)
