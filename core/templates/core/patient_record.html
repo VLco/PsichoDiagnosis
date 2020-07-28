@@ -90,6 +90,9 @@
         $('#id_idRowPatient').hide();
         $('#id_idPatient').hide();
 
+        
+        
+
         $(".nav-tabs a").click(function() {
             $(this).tab('show');
         });
@@ -113,7 +116,7 @@
             $(form_id)[0][4]["value"] = "";
             $(form_id)[0][5]["value"] = "";
             $(form_id)[0][6]["value"] = "";
-            $(form_id)[0][7]["value"] = "";
+            $(form_id)[0][7]["value"] = "M";
             $(form_id)[0][8]["value"] = "";
             $(form_id)[0][9]["value"] = "";
             $(form_id)[0][11].textContent = "Create";
@@ -153,11 +156,11 @@
                         $(form_name)[0][11].textContent = "Update";
                         $(modal_name).modal('show');
                     } else {
-                        alert("Строка не распознана");
+                        alert("String not recognized");
                     }
                 });
             } else {
-                alert("Error: url");
+                alert("Error: url not correct");
             }
 
         });
@@ -183,11 +186,11 @@
                         oTable.fnDeleteRow(oTable.fnGetPosition(row));
 
                     } else {
-                        alert("Строка не удалена");
+                        alert("Line not deleted");
                     }
                 });
             } else {
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 
@@ -220,9 +223,11 @@
                 if (iddb == "") {
                     $.post(url_add, datain, function(data) {
                         if (data == "-1") {
-                            alert("Строка не добавлена");
+                            alert("Line not added");
                         } else if (data == "-2") {
-                            alert("Строка уже существует");
+                            alert("The string already exists");
+                        }else if (data == "-3") {
+                            alert("Date is not correct");
                         } else {
                             var rData = [
                                 Card_number,
@@ -253,9 +258,9 @@
                 } else {
                     $.post(url_update, datain, function(data) {
                         if (data == "-1") {
-                            alert("Строка не изменена");
+                            alert("The line is not changed");
                         } else if (data == "-2") {
-                            alert("Строка пуста");
+                            alert("The string already exists");
                         } else if (data == "0") {
                             var rData = [
                                 Card_number,
@@ -281,12 +286,12 @@
                             $('#add_patient').modal('hide');
                             $('.add-form').trigger('reset');
                         } else {
-                            alert("Ошибка адресации");
+                            alert("Addressing error");
                         }
                     });
                 }
             } else {
-                alert("Error: url");
+                alert("Error: url not correct");
             }
         });
 

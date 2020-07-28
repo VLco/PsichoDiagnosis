@@ -1012,10 +1012,13 @@ def update_diagnos(request):
         name = request.POST.get("nameDiag")
         if  name!='':
             diagnos = Diagnos.objects.get(id=id)
-            diagnos.Name=name
-            diagnos.Description=request.POST.get("descriptionDiag")
-            diagnos.save()
-            error=0
+            if diagnos.Name==name or not Diagnos.objects.filter(Name=name) :
+                diagnos.Name=name
+                diagnos.Description=request.POST.get("descriptionDiag")
+                diagnos.save()
+                error=0
+            else:
+                error=-2
         else:
             error=-2
     return HttpResponse(error)
@@ -1063,10 +1066,13 @@ def update_symptom(request):
         name = request.POST.get("nameSym")
         if  name!='':
             symptom = Symptom.objects.get(id=id)
-            symptom.Name=name
-            symptom.Description=request.POST.get("descriptionSym")
-            symptom.save()
-            error=0
+            if symptom.Name==name or not Symptom.objects.filter(Name=name) :
+                symptom.Name=name
+                symptom.Description=request.POST.get("descriptionSym")
+                symptom.save()
+                error=0
+            else:
+                error=-2
         else:
             error=-2
     return HttpResponse(error)
@@ -1130,7 +1136,10 @@ def add_patient_records(request):
             patient.Adress = address
             patient.Phone = phone
             patient.Sex = sex
-            patient.save()
+            try:
+                patient.save()
+            except ValidationError:
+                return HttpResponse(-3)
             error=patient.id
         else:
             error=-2
@@ -1143,14 +1152,17 @@ def update_patient_records(request):
         number_card = request.POST.get("number_card")
         if  number_card!='':
             patient = PatientRecord.objects.get(id=id)
-            patient.NumberRecord = number_card
-            patient.FIO = request.POST.get("FIO")
-            patient.Birthday = request.POST.get("date_birth")
-            patient.Sex = request.POST.get("sex")
-            patient.Adress = request.POST.get("address")
-            patient.Phone = request.POST.get("phone")
-            patient.save()
-            error=0
+            if patient.NumberRecord==number_card or not PatientRecord.objects.filter(NumberRecord=number_card) :
+                patient.NumberRecord = number_card
+                patient.FIO = request.POST.get("FIO")
+                patient.Birthday = request.POST.get("date_birth")
+                patient.Sex = request.POST.get("sex")
+                patient.Adress = request.POST.get("address")
+                patient.Phone = request.POST.get("phone")
+                patient.save()
+                error=0
+            else:
+                error=-2
         else:
             error=-2
     return HttpResponse(error)
@@ -1183,8 +1195,13 @@ def view_patient_records(request, id, login):
             tr.Note = request.POST.get('note')
             if request.POST.get('date', False):
                 tr.Date = request.POST.get('date')
-            tr.save()
+
+            try:
+                tr.save()
+            except ValidationError:
+                tr = Treatment()
             return HttpResponseRedirect(reverse("view_patient_records", args=[patient.id, user.login]))
+        return HttpResponseRedirect(reverse("view_patient_records", args=[patient.id, user.login]))
     context = {
         'login': login,
         'patient': patient,
@@ -1245,7 +1262,10 @@ def view_treatment(request, id_p, login, id_tr):
             di.Note = request.POST.get('di_note')
             if request.POST.get('di_date', False):
                 di.StartDiagnosis = request.POST.get('di_date')
-            di.save()
+            try:
+                di.save()
+            except ValidationError:
+                di = Diagnosis()
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
 
         if formTr.is_valid() and "changeTr" in request.POST:
@@ -1254,7 +1274,10 @@ def view_treatment(request, id_p, login, id_tr):
             treatment.Note = request.POST.get('note')
             if request.POST.get('date', False):
                 treatment.Date = request.POST.get('date')
-            treatment.save()
+            try:
+                treatment.save()
+            except ValidationError:
+                treatment.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
 
         if formAn.is_valid() and "anamesis" in request.POST:
@@ -1266,7 +1289,7 @@ def view_treatment(request, id_p, login, id_tr):
             anamesis.save()
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
 
-        if formEp.is_valid():
+        if formEp.is_valid() and "epicrisis" in request.POST:
             if Epicrisis.objects.filter(Treatment=treatment).exists():
                 epicrisis = Epicrisis.objects.get(Treatment=treatment)
             else:
@@ -1281,10 +1304,15 @@ def view_treatment(request, id_p, login, id_tr):
                 epicrisis.Hospitalization = treatment.Date
             
             epicrisis.HospitalDischarge =request.POST.get('hospitalDischarge')
-            epicrisis.save()
+
+            try:
+                epicrisis.save()
+            except ValidationError:
+                epicrisis.Referral = request.POST.get('referral')
+
             template = "core/view_treatment.html"
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
-
+        return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
     context = {
         'login': login,
         'patient': patient,
@@ -1430,6 +1458,9 @@ def update_person(request):
             error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
+
+#####
+#Синдромы
 def add_syndrom(request):
     error=-1
     if request.method == "POST":
@@ -1511,8 +1542,8 @@ def update_symrule(request):
         idRul= request.POST.get("idSRuleRule")
         idSym = request.POST.get("idSymRule")
         idConv = request.POST.get("idConvRule")
-        if not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
-            ruleSymptom = RuleSymptom.objects.get(id=id)
+        ruleSymptom = RuleSymptom.objects.get(id=id)
+        if ruleSymptom.Symptom==Symptom.objects.get(id=idSym) or not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
             ruleSymptom.Rule = Rule.objects.get(id=idRul)
             ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
             ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
@@ -1614,8 +1645,8 @@ def update_questdoc(request):
         logDoc= request.POST.get("uqlogDoc")
         idDoc = Doctor.objects.all().get(login=logDoc).id
         note= request.POST.get("uqnote")
-        if not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
-            selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
+        selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
+        if selectDoctor.Symptom==Symptom.objects.get(id=idSym) or not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
             selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
             selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
             selectDoctor.Conviction=Conviction.objects.get(id=idConv)
@@ -1686,8 +1717,8 @@ def update_questForm(request):
         idConv = request.POST.get("uqidConv")
         idForm= request.POST.get("uqidForm")
         note= request.POST.get("uqnote")
-        if not SelectedSymptoms.objects.all().filter(Symptom=idSym, Form=idForm):
-            select = SelectedSymptoms.objects.get(id=id)
+        select = SelectedSymptoms.objects.get(id=id)
+        if select.Symptom==Symptom.objects.get(id=idSym) or not SelectedSymptoms.objects.all().filter(Symptom=idSym, Form=idForm):
             select.Form = Form.objects.get(id=idForm)
             select.Symptom=Symptom.objects.all().get(id=idSym)
             select.Conviction=Conviction.objects.get(id=idConv)

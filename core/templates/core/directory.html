@@ -208,7 +208,7 @@
         $('#id_idRowSym').hide();
         $('#id_idDiag').hide();
         $('#id_idSym').hide();
-
+        
         // Настройки списка
         $(".nav-tabs a").click(function() {
             $(this).tab('show');
@@ -438,9 +438,9 @@
                 } else { //Изменение
                     $.post(url_update, datain, function(data) {
                         if (data == "-1") {
-                            alert("Строка не изменена");
+                            alert("Line not update");
                         } else if (data == "-2") {
-                            alert("Строка пуста");
+                            alert("Line already exists or is empty");
                         } else if (data == "0") {
                             var rData = [
                                 name,
