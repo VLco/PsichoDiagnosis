@@ -22,13 +22,13 @@ class PatientRecord(models.Model):
 class Doctor(models.Model):
     #Patient = models.ManyToManyField(PatientRecord, through='PatientList') #useless
     login = models.CharField(max_length=200, verbose_name='login')
-    email = models.CharField(max_length=200, verbose_name='email')
-    password = models.CharField(max_length=50, verbose_name='password')
-    FIO = models.CharField(max_length=50, verbose_name='last first middle name', default="")
+    email = models.CharField(max_length=200, verbose_name='email', default="", blank=True )
+    password = models.CharField(max_length=50, verbose_name='password', default="", blank=True )
+    FIO = models.CharField(max_length=50, verbose_name='last first middle name', default="", blank=True )
     Activated = models.BooleanField(default=False)
-    SocialNetwork = models.CharField(max_length=50, verbose_name='SocialNetwork', default="")
-    Position = models.CharField(max_length=50, verbose_name='position', default=" ")
-    Department = models.CharField(max_length=50, verbose_name='department', default="")
+    SocialNetwork = models.CharField(max_length=50, verbose_name='SocialNetwork', default="", blank=True )
+    Position = models.CharField(max_length=50, verbose_name='position', default="", blank=True )
+    Department = models.CharField(max_length=50, verbose_name='department', default="", blank=True )
 
     def __str__(self):
         return self.login
