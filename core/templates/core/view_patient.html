@@ -1,7 +1,9 @@
 {% extends 'core/base.html' %}
 {% block title %}Patient view{% endblock %}
 {% block content %}
-    <div class="d-flex justify-content-center mt-5">
+<a type="button" rel="tooltip" href="{% url 'patient_records' login=login %}" class="ml-3 mt-2 h5 text-white" data-original-title="" title="">&#8592; back (Patient records)</a>
+
+    <div class="d-flex justify-content-center mt-3">
         <div class="col-md-7 mb-1 mt-1 text-white text-center ">
             <div class="container">
                 <h1 class="jumbotron-heading">Patient</h1>
@@ -16,11 +18,11 @@
             <div class="card-body">
                 <div class="border-bottom pb-4">
                     <h4 class="card-title">{{ patient.FIO }}</h4>
-                    <p class="card-text text-dark mx-2">Number Card: {{ patient.NumberRecord }}</p>
-                    <p class="card-text text-dark mx-2">Birthday: {{ patient.Birthday }}</p>
-                    <p class="card-text text-dark mx-2">Sex: {{ patient.Sex }}</p>
-                    <p class="card-text text-dark mx-2">Adress: {{ patient.Adress }}</p>
-                    <p class="card-text text-dark mx-2">Phone: {{ patient.Phone }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Number Card: {{ patient.NumberRecord }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Birthday: {{ patient.Birthday }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Sex: {{ patient.Sex }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Adress: {{ patient.Adress }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Phone: {{ patient.Phone }}</p>
 
                 </div>
 
@@ -31,23 +33,24 @@
                             <thead>
                             <tr>
                                 <a id="treatment_btn" href="" data-toggle="modal" data-target="#add_treatment"
-                                   class="btn btn-primary btn-xs pull-left add-elem">Add new treatment</a>
-                                <th>Doctor</th>
-                                <th>Name</th>
-                                <th>Note</th>
+                                   class="btn btn-primary btn-xs pull-left add-elem">Add new treatment
+                                </a>
                                 <th>Date</th>
+                                <th>Name</th>
+                                <th>Doctor</th>
+                                <th>Note</th>
                                 <th class="text-right">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for treatment in listTre %}
                                 <tr>
-                                    <td>{{ treatment.Doctor }}</td>
-                                    <td>{{ treatment.Name }}</td>
-                                    <td>{{ treatment.Note }}</td>
                                     <td>{{ treatment.Date }}</td>
+                                    <td>{{ treatment.Name }}</td>
+                                    <td>{{ treatment.Doctor }}</td>
+                                    <td>{{ treatment.Note }}</td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-3"
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-2"
                                             href="{% url 'delete_treatment' patient.id user.login treatment.id %}">
                                             <i class="material-icons">close</i>
                                         </a>
@@ -81,7 +84,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body container d-flex flex-column">
                         {% csrf_token %} 
                         {{ formTreatment }}
                     </div>
@@ -96,12 +99,19 @@
 
 
     <script>
-        $('#treatment_table').DataTable({
-            "aLengthMenu": [
-                [5, 10, 25, -1],
-                [5, 10, 25, "All"]
-            ]
+        $(document).ready(function() {
+            $('#treatment_table').DataTable({
+                "aLengthMenu": [
+                    [5, 10, 25, -1],
+                    [5, 10, 25, "All"]
+                ]
+            });
+
+            $('#id_doctor').select2({
+                dropdownParent: $("#add_treatment")
+            });
         });
+
 
 
     </script>

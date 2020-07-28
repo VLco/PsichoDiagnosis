@@ -1,7 +1,9 @@
 {% extends 'core/base.html' %}
 {% block title %}Diagnosis view{% endblock %}
 {% block content %}
-    <div class="d-flex justify-content-center mt-5">
+<a type="button" rel="tooltip" href="{% url 'view_treatment' patient.id login treatment.id%}" class="ml-3 mt-2 h5 text-white" data-original-title="" title="">&#8592; back (Treatment)</a>
+
+    <div class="d-flex justify-content-center mt-3">
         <div class="col-md-7 mb-1 mt-1 text-white text-center ">
             <div class="container">
                 <h1 class="jumbotron-heading">Diagnosis</h1>
@@ -47,11 +49,11 @@
                                     <td>{{ form.Conviction }}</td>
 
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-3"
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-2"
                                             href="{% url 'delete_form' login form.id %}">
                                             <i class="material-icons">close</i>
                                         </a>
-                                        <a class="btn btn-success btn-just-icon btn-sm update"
+                                        <a class="btn btn-info btn-just-icon btn-sm update"
                                             href="{% url 'view_form' patient.id user.login treatment.id diagnosis.id form.id %}">
                                             <i class="material-icons">edit</i>
                                         </a>

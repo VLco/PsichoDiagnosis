@@ -2,7 +2,9 @@
 {% block title %}Questionary{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center mt-3">
+<a type="button" rel="tooltip" href="{% url 'view_diagnosis' patient.id user.login treatment.id diagnosis.id %}" class="ml-3 mt-2 h5 text-white" data-original-title="" title="">&#8592; back (Diagnosis)</a>
+
+<div class="d-flex justify-content-center mt-1">
     <div class="col-md-7 mb-1 mt-1 text-white text-center ">
         <div class="container">
             <h1 class="jumbotron-heading">Questionary</h1>
@@ -97,7 +99,7 @@
         $('#id_idSymRow').hide();
         $('#id_idSymId').hide();
         $('#id_idForm').hide();
-        $('#id_idForm').val({{ form.id }});
+        $('#id_idForm').val("{{ form.id }}");
         $("#id_uqidSymRow").hide();
         $("#id_uqidSymId").hide();
         $("#id_uqidForm").hide();

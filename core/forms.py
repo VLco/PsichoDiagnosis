@@ -274,10 +274,10 @@ class uDoctorSymptomForm(forms.Form):
     uqnote.widget.attrs.update({'class': 'form-control'})
 
 class formTreatment(forms.Form):
+    date = forms.DateField(initial=date.today())
+    name = forms.CharField()
     doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login")
-    name = forms.CharField(required="")
     note = forms.CharField(required="")
-    date = forms.DateField(required=False)
 
     doctor.widget.attrs.update({'class': 'form-control'})
     name.widget.attrs.update({'class': 'form-control'})
@@ -285,15 +285,15 @@ class formTreatment(forms.Form):
     date.widget.attrs.update({'class': 'form-control'})
 
 class formDiagnosis(forms.Form):
-    doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login")
-    name = forms.CharField(required="")
-    note = forms.CharField(required="")
-    start_diagnosis = forms.DateField(required=False)
+    di_start_diagnosis = forms.DateField(initial=date.today(),  label="Start Diagnosis")
+    di_name = forms.CharField(label="Name")
+    di_doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login", label="Doctor")
+    di_note = forms.CharField(required="", label="Note")
 
-    doctor.widget.attrs.update({'class': 'form-control'})
-    name.widget.attrs.update({'class': 'form-control'})
-    note.widget.attrs.update({'class': 'form-control'})
-    start_diagnosis.widget.attrs.update({'class': 'form-control'})
+    di_doctor.widget.attrs.update({'class': 'form-control'})
+    di_name.widget.attrs.update({'class': 'form-control'})
+    di_note.widget.attrs.update({'class': 'form-control'})
+    di_start_diagnosis.widget.attrs.update({'class': 'form-control'})
 
 class formForm(forms.Form):
     name = forms.CharField()
@@ -305,18 +305,17 @@ class formForm(forms.Form):
     dateForm.widget.attrs.update({'class': 'form-control'})
 
 class formAnamesis(forms.Form):
-    diagnos = forms.ModelChoiceField(Diagnos.objects.all(), to_field_name="Name", required=True)
-
+    diagnos = forms.ModelChoiceField(Diagnos.objects.all(), required=True)
     diagnos.widget.attrs.update({'class': 'form-control'})
 
 
 class formEpicrisis(forms.Form):
-    referral = forms.CharField()
-    therapy = forms.CharField()
-    disability = forms.CharField()
+    referral = forms.CharField(required=False)
+    therapy = forms.CharField(required=False)
+    disability = forms.CharField(required=False)
     hospitalization = forms.DateField(required=False)
-    hospitalDischarge = forms.DateField(required=True, initial=date.today())
-    is_over = forms.BooleanField(label="Is over")
+    hospitalDischarge = forms.DateField(required=False, initial=date.today())
+    is_over = forms.BooleanField(label="Is over", required=False)
 
     referral.widget.attrs.update({'class': 'form-control'})
     therapy.widget.attrs.update({'class': 'form-control'})

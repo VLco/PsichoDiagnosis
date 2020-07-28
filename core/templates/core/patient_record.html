@@ -205,6 +205,13 @@
             FIO = $(this)[0][5]["value"];
             Birthday = $(this)[0][6]["value"];
             Sex = $(this)[0][7]["value"];
+            
+            if(Sex=="M"){
+                Sex="Man";
+            }
+            if(Sex=="W"){
+                Sex="Woman";
+            }
             Adress = $(this)[0][8]["value"];
             Phone = $(this)[0][9]["value"];
 
@@ -231,9 +238,9 @@
                                 '<button type="button" rel="tooltip" data-id="' + data + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
                                 '<i class="material-icons">close</i>' +
                                 '</button>' +
-                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm ml-1" data-original-title="" title="">' +
+                                '<a type="button" rel="tooltip"  href="/patient_records/view/'+ data +'/'+'{{login}}'+'" class="btn btn-info btn-just-icon btn-sm ml-1" data-original-title="" title="">' +
                                 '<i class="material-icons">person</i>' +
-                                '</button>' +
+                                '</a>' +
                                 '</div>'
                             ];
 
@@ -264,9 +271,9 @@
                                 '<button type="button" rel="tooltip" data-id="' + iddb + '" data-db="' + db + '" class="btn btn-danger btn-just-icon btn-sm delete " data-original-title="" title="">' +
                                 '<i class="material-icons">close</i>' +
                                 '</button>' +
-                                '<button type="button" rel="tooltip" class="btn btn-info btn-just-icon btn-sm" data-original-title="" title="">' +
+                                '<a type="button" rel="tooltip"  href="/patient_records/view/'+ iddb +'/'+'{{login}}'+'" class="btn btn-info btn-just-icon btn-sm ml-1" data-original-title="" title="">' +
                                 '<i class="material-icons">person</i>' +
-                                '</button>' +
+                                '</a>' +
                                 '</div>'
                             ];
                             $(table_name).DataTable().row(rowid).data(rData).draw();

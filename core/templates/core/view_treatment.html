@@ -2,6 +2,9 @@
 {% load tags %}
 {% block title %}Treatment view{% endblock %}
 {% block content %}
+
+<a type="button" rel="tooltip" href="{% url 'view_patient_records' patient.id login %}" class="ml-3 mt-2 h5 text-white" data-original-title="" title="">&#8592; back (Patient)</a>
+
     <div class="d-flex justify-content-center mt-5">
         <div class="col-md-7 mb-1 mt-1 text-white text-center ">
             <div class="container">
@@ -15,21 +18,29 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="row border-bottom pb-4">
-                    <div class="col-8">
+                <div class=" border-bottom pb-4">
+                    <div class="container">
                         <h4 class="card-title">{{ treatment.Name }}</h4>
-                        <p class="card-text text-dark mx-2">Doctor: {{ treatment.Doctor }}</p>
-                        <p class="card-text text-dark mx-2">Note: {{ treatment.Note }}</p>
-                        <p class="card-text text-dark mx-2">Date: {{ treatment.Date }}</p>
-                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change"
-                           class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
-                    </div>
-                    <div class="col-4 d-flex flex-column">
-                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#anamesis"
-                           class="btn btn-primary  flex-fill my-4 ">Anamesis</a>
-                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#epicrisis"
-                           class="btn btn-primary add-elem flex-fill my-4 ">Epicrisis</a>
-                    </div>
+                        <p class="card-text text-dark mx-2 border-bottom pl-1">Doctor: {{ treatment.Doctor }}</p>
+                        <p class="card-text text-dark mx-2 border-bottom pl-1">Note: {{ treatment.Note }}</p>
+                        <p class="card-text text-dark mx-2 border-bottom pl-1">Date: {{ treatment.Date }}</p>
+                        <div class="d-flex justify-content-between">
+                            <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change"
+                                class="btn btn-primary mr-5">Сhange</a>
+                            <div>
+                                <a id="diagnos_btn" href="" data-toggle="modal" data-target="#anamesis"
+                                class="btn btn-success mr-2">Anamesis</a>
+                                <a id="diagnos_btn" href="" data-toggle="modal" data-target="#epicrisis"
+                                    class="btn btn-success ">Epicrisis</a>
+                            </div>
+                            
+                            
+                        </div>
+                        
+                        
+                    </div>                        
+                    
+
 
                 </div>
 
@@ -40,28 +51,29 @@
                             <thead>
                             <tr>
                                 <a id="diagn_btn" href="" data-toggle="modal" data-target="#add_diagn"
-                                   class="btn btn-primary btn-xs pull-left add-elem">Add new diagnosis</a>
-                                <th>Doctor</th>
-                                <th>Name</th>
+                                   class="btn btn-primary btn-xs pull-left add-elem">Add new diagnosis
+                                </a>
                                 <th>Start Diagnosis</th>
-                                <th>note</th>
+                                <th>Name</th>
+                                <th>Doctor</th>
+                                <th>Note</th>
                                 <th class="text-right">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for diagn in listD %}
                                 <tr>
-                                    <td>{{ diagn.Doctor }}</td>
-                                    <td>{{ diagn.Name }}</td>
                                     <td>{{ diagn.StartDiagnosis }}</td>
+                                    <td>{{ diagn.Name }}</td>
+                                    <td>{{ diagn.Doctor }}</td>
                                     <td>{{ diagn.Note }}</td>
                                     <td class="td-actions text-right">
-                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-3"
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-2"
                                             href="{% url 'delete_diagnosis' patient.id user.login treatment.id diagn.id %}">
                                             <i class="material-icons">close</i>
                                         </a>
                                         <a class="btn btn-info btn-just-icon btn-sm"
-                                           href="{% url "view_diagnosis" patient.id user.login treatment.id diagn.id %}">
+                                           href="{% url 'view_diagnosis' patient.id user.login treatment.id diagn.id %}">
                                             <i class="material-icons">edit</i>
                                         </a>
                                     </td>
@@ -79,7 +91,7 @@
         </div>
     </div>
 
-    <form class="add-form" data-db="changes" method="POST">
+    <form id="form_change" class="add-form" data-db="changes" method="POST">
         <div id="change" class="modal" tabindex="0" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -89,8 +101,9 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        {% csrf_token %} {{ formTreatment }}
+                    <div class="modal-body container d-flex flex-column">
+                        {% csrf_token %} 
+                        {{ formTreatment }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -102,7 +115,7 @@
     </form>
 
 
-    <form class="add-form" data-db="changes" method="POST">
+    <form id="form_anamesis" class="add-form" data-db="changes" method="POST">
         <div id="anamesis" class="modal" tabindex="0" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -112,23 +125,13 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        {% if anamesis is 0 %}
-                            {% csrf_token %} {{ formAnamesis }}
-                        {% else %}
-                            <h4 class="card-title">Anamesis for {{ treatment.Record.FIO }}.
-                                Treatment {{ treatment.Name }}</h4>
-                            <p class="card-text text-dark mx-2">Diagnos: {{ anamesis.Diagnos.Name }}</p>
-                            <p class="card-text text-dark mx-2">Description diagnos
-                                : {{ anamesis.Diagnos.Description }}</p>
-
-                        {% endif %}
+                    <div class="modal-body container d-flex flex-column">
+                        {% csrf_token %} 
+                        {{ formAnamesis }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        {% if anamesis is 0 %}
-                            <button type="submit" class="btn btn-primary" name="anamesis">Save</button>
-                        {% endif %}
+                        <button type="submit" class="btn btn-primary" name="anamesis">Save</button>
                     </div>
                 </div>
             </div>
@@ -136,7 +139,7 @@
     </form>
 
 
-    <form class="add-form" data-db="changes" method="POST">
+    <form id="form_epicrisis" class="add-form" data-db="changes" method="POST">
         <div id="epicrisis" class="modal" tabindex="0" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -147,35 +150,19 @@
                         </button>
                     </div>
                     <div class="modal-body">
-
-                        {% if epicrisis is 0 %}
-                            {% csrf_token %} {{ formEpicrisis }}
-                        {% else %}
-                            <h4 class="card-title">Epicrisis for {{ treatment.Record.FIO }}.
-                                Treatment {{ treatment.Name }}</h4>
-                            <p class="card-text text-dark mx-2">Refrral: {{ epicrisis.Referral }}</p>
-                            <p class="card-text text-dark mx-2">Therapy: {{ epicrisis.Therapy }}</p>
-                            <p class="card-text text-dark mx-2">Disability: {{ epicrisis.Disability }}</p>
-                            <p class="card-text text-dark mx-2">Hospitalization: {{ epicrisis.Hospitalization }}</p>
-                            <p class="card-text text-dark mx-2">HospitalDischarge: {{ epicrisis.HospitalDischarge }}</p>
-                            <p class="card-text text-dark mx-2">Hospitalization: {{ epicrisis.Hospitalization }}</p>
-                            <p class="card-text text-dark mx-2">IsOver: {% if epicrisis.IsOver is 0 %}no{% else %}yes{% endif %}</p>
-
-                        {% endif %}
-
+                            {% csrf_token %} 
+                            {{ formEpicrisis }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        {% if epicrisis is 0 %}
-                            <button type="submit" class="btn btn-primary" name="anamesis">Save</button>
-                        {% endif %}
+                        <button type="submit" class="btn btn-primary" name="anamesis">Save</button>
                     </div>
                 </div>
             </div>
         </div>
     </form>
 
-    <form id="form_add" class="add-form" data-db="records" method="POST">
+    <form id="form_diagnosis" class="add-form" data-db="records" method="POST">
         <div id="add_diagn" class="modal" tabindex="0" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -185,8 +172,9 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        {% csrf_token %} {{ formDiagnosis }}
+                    <div class="modal-body container d-flex flex-column">
+                        {% csrf_token %} 
+                        {{ formDiagnosis }}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -199,13 +187,27 @@
 
 
     <script>
-        $('#diagn_table').DataTable({
-            "aLengthMenu": [
-                [5, 10, 25, -1],
-                [5, 10, 25, "All"]
-            ]
-        });
 
+        $(document).ready(function() {
+            $('#diagn_table').DataTable({
+                "aLengthMenu": [
+                    [5, 10, 25, -1],
+                    [5, 10, 25, "All"]
+                ]
+            });
+
+            $('#id_di_doctor').select2({
+                dropdownParent: $("#add_diagn")
+            });
+
+            $('#id_diagnos').select2({
+                dropdownParent: $("#anamesis")
+            });
+
+            $('#id_doctor').select2({
+                dropdownParent: $("#change")
+            });
+        });
 
     </script>
     <style>
