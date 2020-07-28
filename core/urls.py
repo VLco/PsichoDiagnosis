@@ -3,48 +3,7 @@ from django.urls import path, re_path
 from core import views
 
 
-from .views import PatientRecordView
-from .views import SinglePatientRecordView
-
-from .views import DoctorView
-from .views import LoginDoctorView
-
-from .views import PatientListView
-from .views import SinglePatientListView
-
-from .views import TreatmentView
-from .views import SingleTreatmentView
-
-from .views import EpicrisisView
-from .views import SingleEpicrisisView
-
-from .views import DiagnosisView
-from .views import SingleDiagnosisView
-
-from .views import DiagnosView
-from .views import SingleDiagnosView
-
-from .views import FormView
-from .views import SingleFormView
-
-from .views import RuleView
-from .views import SingleRuleView
-
-from .views import SymptomView
-from .views import SingleSymptomView
-
-from .views import RuleSymptomView
-from .views import SingleRuleSymptomView
-
-from .views import SelectedSymptomsView
-from .views import SingleSelectedSymptomsView
-
-from .views import SelectedSymptomsDoctorView
-from .views import SingleSelectedSymptomsDoctorView
-
-from .views import AnamesisView
-from .views import SingleAnamesisView
-
+from .views import *
 
 urlpatterns = [
     
@@ -91,7 +50,9 @@ urlpatterns = [
     path('patient_records/delete/', views.delete_patient_records, name="delete_patient_records"),
     path('patient_records/update/', views.update_patient_records, name="update_patient_records"),
     path('patient_records/get/', views.get_patient_records, name="get_patient_records"),
+
     path('patient_records/view/<id>/<login>', views.view_patient_records, name="view_patient_records"),
+    path('patient_records/view/<id>/<login>/del=<int:id_entry>', views.delete_treatment, name="delete_treatment"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
 

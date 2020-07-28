@@ -47,19 +47,13 @@
                                     <td>{{ treatment.Note }}</td>
                                     <td>{{ treatment.Date }}</td>
                                     <td class="td-actions text-right">
-                                        <button type="button" rel="tooltip" data-id="{{ patient.id }}" data-db="record"
-                                                class="btn btn-success btn-just-icon btn-sm update"
-                                                data-original-title="" title="">
-                                            <i class="material-icons">edit</i>
-                                        </button>
-                                        <button type="button" rel="tooltip" data-id="{{ patient.id }}" data-db="record"
-                                                class="btn btn-danger btn-just-icon btn-sm delete mr-3"
-                                                data-original-title="" title="">
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-3"
+                                            href="{% url 'delete_treatment' patient.id user.login treatment.id %}">
                                             <i class="material-icons">close</i>
-                                        </button>
+                                        </a>
                                         <a class="btn btn-info btn-just-icon btn-sm"
                                            href="{% url 'view_treatment' patient.id user.login treatment.id %}">
-                                            <i class="material-icons">person</i>
+                                            <i class="material-icons">edit</i>
                                         </a>
                                     </td>
                                 </tr>

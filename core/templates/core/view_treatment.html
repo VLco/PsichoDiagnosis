@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load tags %}
 {% block title %}Treatment view{% endblock %}
 {% block content %}
     <div class="d-flex justify-content-center mt-5">
@@ -14,11 +15,22 @@
 
         <div class="card">
             <div class="card-body">
-                <div class="border-bottom pb-4">
-                    <h4 class="card-title">{{ treatment.Name }}</h4>
-                    <p class="card-text text-dark mx-2">Doctor: {{ treatment.Doctor }}</p>
-                    <p class="card-text text-dark mx-2">Note: {{ treatment.Note }}</p>
-                    <p class="card-text text-dark mx-2">Date: {{ treatment.Date }}</p>
+                <div class="row border-bottom pb-4">
+                    <div class="col-8">
+                        <h4 class="card-title">{{ treatment.Name }}</h4>
+                        <p class="card-text text-dark mx-2">Doctor: {{ treatment.Doctor }}</p>
+                        <p class="card-text text-dark mx-2">Note: {{ treatment.Note }}</p>
+                        <p class="card-text text-dark mx-2">Date: {{ treatment.Date }}</p>
+                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#change"
+                           class="btn btn-primary btn-xs pull-left add-elem">Сhange</a>
+                    </div>
+                    <div class="col-4 d-flex flex-column">
+                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#anamesis"
+                           class="btn btn-primary  flex-fill my-4 ">Anamesis</a>
+                        <a id="diagnos_btn" href="" data-toggle="modal" data-target="#epicrisis"
+                           class="btn btn-primary add-elem flex-fill my-4 ">Epicrisis</a>
+                    </div>
+
                 </div>
 
                 <div class="tab-content">
@@ -39,7 +51,7 @@
                             <tbody>
                             {% for diagn in listD %}
                                 <tr>
-                                    <td>{{ diagn.Doctor}}</td>
+                                    <td>{{ diagn.Doctor }}</td>
                                     <td>{{ diagn.Name }}</td>
                                     <td>{{ diagn.StartDiagnosis }}</td>
                                     <td>{{ diagn.Note }}</td>
@@ -73,6 +85,99 @@
         </div>
     </div>
 
+    <form class="add-form" data-db="changes" method="POST">
+        <div id="change" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Make changes</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %} {{ formTreatment }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="changeTr">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form class="add-form" data-db="changes" method="POST">
+        <div id="anamesis" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Make changes</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% if anamesis is 0 %}
+                            {% csrf_token %} {{ formAnamesis }}
+                        {% else %}
+                            <h4 class="card-title">Anamesis for {{ treatment.Record.FIO }}.
+                                Treatment {{ treatment.Name }}</h4>
+                            <p class="card-text text-dark mx-2">Diagnos: {{ anamesis.Diagnos.Name }}</p>
+                            <p class="card-text text-dark mx-2">Description diagnos
+                                : {{ anamesis.Diagnos.Description }}</p>
+
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        {% if epicrisis is 0 %}
+                            <button type="submit" class="btn btn-primary" name="anamesis">Save</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <form class="add-form" data-db="changes" method="POST">
+        <div id="epicrisis" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Make changes</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        {% if epicrisis is 0 %}
+                            {% csrf_token %} {{ formEpicrisis }}
+                        {% else %}
+                            <h4 class="card-title">Epicrisis for {{ treatment.Record.FIO }}.
+                                Treatment {{ treatment.Name }}</h4>
+                            <p class="card-text text-dark mx-2">Refrral: {{ epicrisis.Referral }}</p>
+                            <p class="card-text text-dark mx-2">Therapy: {{ epicrisis.Therapy }}</p>
+                            <p class="card-text text-dark mx-2">Disability: {{ epicrisis.Disability }}</p>
+                            <p class="card-text text-dark mx-2">Hospitalization: {{ epicrisis.Hospitalization }}</p>
+                            <p class="card-text text-dark mx-2">HospitalDischarge: {{ epicrisis.HospitalDischarge }}</p>
+                            <p class="card-text text-dark mx-2">Hospitalization: {{ epicrisis.Hospitalization }}</p>
+                            <p class="card-text text-dark mx-2">IsOver: {% if epicrisis.IsOver is 0 %}no{% else %}yes{% endif %}</p>
+
+                        {% endif %}
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="epicrisis">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 
     <form id="form_add" class="add-form" data-db="records" method="POST">
         <div id="add_diagn" class="modal" tabindex="0" role="dialog">
@@ -89,7 +194,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="submit" class="btn btn-primary" name="createDi">Create</button>
                     </div>
                 </div>
             </div>

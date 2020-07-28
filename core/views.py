@@ -1175,7 +1175,7 @@ def view_patient_records(request, id, login):
             tr.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
             tr.Name = request.POST.get('name')
             tr.Note = request.POST.get('note')
-            if tr.Date is request.POST.get('date', False):
+            if request.POST.get('date', False):
                 tr.Date = request.POST.get('date')
             tr.save()
             return HttpResponseRedirect(reverse("view_patient_records", args=[patient.id, user.login]))
@@ -1191,32 +1191,98 @@ def view_patient_records(request, id, login):
     pass
 
 
+def delete_treatment(request, id, login, id_entry):
+    user = Doctor.objects.get(login=login)
+    patient = PatientRecord.objects.get(id=id)
+    treatment = Treatment.objects.get(id=id_entry)
+    treatment.delete()
+    return HttpResponseRedirect(reverse("view_patient_records", args=[patient.id, user.login]))
+    pass
+
 def view_treatment(request, id_p, login, id_tr):
     user = Doctor.objects.get(login=login)
     patient = PatientRecord.objects.get(id=id_p)
     treatment = Treatment.objects.get(id=id_tr)
     diag = Diagnosis.objects.filter(Treatment=treatment)
+    anamesis = 0
+    epicrisis = 0
     if request.method != "POST":
         form = formDiagnosis()
+        formTr = formTreatment()
+        formAn = formAnamesis()
+        formEp = formEpicrisis()
+
+        if Anamesis.objects.filter(Treatment=treatment).exists():
+            anamesis = Anamesis.objects.get(Treatment=treatment)
+
+
+        if Epicrisis.objects.filter(Treatment=treatment).exists():
+            epicrisis = Epicrisis.objects.get(Treatment=treatment)
+
     else:
-        formAdd = formDiagnosis(request.POST)
-        if formAdd.is_valid():
+        form = formDiagnosis(request.POST)
+        formTr = formTreatment(request.POST)
+        formAn = formAnamesis(request.POST)
+        formEp = formEpicrisis(request.POST)
+        if form.is_valid() and "createDi" in request.POST:
             di = Diagnosis()
             di.Treatment = treatment
             di.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
             di.Name = request.POST.get('name')
             di.Note = request.POST.get('note')
-            if di.StartDiagnosis is request.POST.get('date', False):
+            if request.POST.get('date', False):
                 di.StartDiagnosis = request.POST.get('date')
             di.save()
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
+
+        if formTr.is_valid() and "changeTr" in request.POST:
+            treatment.Doctor = Doctor.objects.get(login=request.POST.get('doctor'))
+            treatment.Name = request.POST.get('name')
+            treatment.Note = request.POST.get('note')
+            if request.POST.get('date', False):
+                treatment.Date = request.POST.get('date')
+            treatment.save()
+            return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
+
+        if formAn.is_valid() and "anamesis" in request.POST:
+            if Anamesis.objects.filter(Treatment=treatment).exists():
+                anamesis = Anamesis.objects.get(Treatment=treatment)
+            else:
+                anamesis = Anamesis(Treatment=treatment)
+            anamesis.Diagnos = Diagnos.objects.get(Name=request.POST.get('diagnos'))
+            anamesis.save()
+            return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
+
+        if formEp.is_valid() and "epicrisis" in request.POST:
+            if Epicrisis.objects.filter(Treatment=treatment).exists():
+                epicrisis = Epicrisis.objects.get(Treatment=treatment)
+            else:
+                epicrisis = Epicrisis(Treatment=treatment)
+            epicrisis.Referral = request.POST.get('referral')
+            epicrisis.Therapy = request.POST.get('therapy')
+            epicrisis.IsOver = 1 if request.POST.get('is_over') is 'on' else 0
+            epicrisis.Disability = request.POST.get('disability')
+            if request.POST.get('hospitalization', False):
+                epicrisis.Hospitalization = request.POST.get('hospitalization')
+            else:
+                epicrisis.Hospitalization = treatment.Date
+            epicrisis.HospitalDischarge =request.POST.get('hospitalDischarge')
+            epicrisis.save()
+            return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
+
     context = {
         'login': login,
         'patient': patient,
         'user': user,
         'listD': diag,
         "treatment": treatment,
-        "formDiagnosis": form
+        "formDiagnosis": form,
+        'formTreatment': formTr,
+        'formAnamesis': formAn,
+        'formEpicrisis': formEp,
+        'anamesis': anamesis,
+        'epicrisis': epicrisis,
+
     }
     template = "core/view_treatment.html"
     return render(request, template, context)

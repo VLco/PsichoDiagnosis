@@ -302,3 +302,24 @@ class formForm(forms.Form):
     name.widget.attrs.update({'class': 'form-control'})
     note.widget.attrs.update({'class': 'form-control'})
     dateForm.widget.attrs.update({'class': 'form-control'})
+
+class formAnamesis(forms.Form):
+    diagnos = forms.ModelChoiceField(Diagnos.objects.all(), to_field_name="Name", required=True)
+
+    diagnos.widget.attrs.update({'class': 'form-control'})
+
+
+class formEpicrisis(forms.Form):
+    referral = forms.CharField()
+    therapy = forms.CharField()
+    disability = forms.CharField()
+    hospitalization = forms.DateField(required=False)
+    hospitalDischarge = forms.DateField(required=True, initial=date.today())
+    is_over = forms.BooleanField(label="Is over")
+
+    referral.widget.attrs.update({'class': 'form-control'})
+    therapy.widget.attrs.update({'class': 'form-control'})
+    disability.widget.attrs.update({'class': 'form-control'})
+    hospitalization.widget.attrs.update({'class': 'form-control'})
+    hospitalDischarge.widget.attrs.update({'class': 'form-control'})
+    is_over.widget.attrs.update({'class': 'form-control'})
