@@ -277,7 +277,7 @@ class formTreatment(forms.Form):
     date = forms.DateField(initial=date.today())
     name = forms.CharField()
     doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login")
-    note = forms.CharField(required="")
+    note = forms.CharField(required=False ,max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}))
 
     doctor.widget.attrs.update({'class': 'form-control'})
     name.widget.attrs.update({'class': 'form-control'})
@@ -288,7 +288,7 @@ class formDiagnosis(forms.Form):
     di_start_diagnosis = forms.DateField(initial=date.today(),  label="Start Diagnosis")
     di_name = forms.CharField(label="Name")
     di_doctor = forms.ModelChoiceField(queryset=Doctor.objects.all(), to_field_name="login", label="Doctor")
-    di_note = forms.CharField(required="", label="Note")
+    di_note = forms.CharField(required=False ,max_length=10000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}), label="Note")
 
     di_doctor.widget.attrs.update({'class': 'form-control'})
     di_name.widget.attrs.update({'class': 'form-control'})
@@ -298,7 +298,7 @@ class formDiagnosis(forms.Form):
 class formForm(forms.Form):
     name = forms.CharField()
     dateForm = forms.DateField(initial=date.today())
-    note = forms.CharField(required=False)
+    note = forms.CharField(required=False ,max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}))
 
     name.widget.attrs.update({'class': 'form-control'})
     note.widget.attrs.update({'class': 'form-control'})
@@ -311,7 +311,7 @@ class formAnamesis(forms.Form):
 
 class formEpicrisis(forms.Form):
     referral = forms.CharField(required=False)
-    therapy = forms.CharField(required=False)
+    therapy = forms.CharField(required=False ,max_length=1000, widget=forms.Textarea(attrs={'rows': 2, 'cols': 40}))
     disability = forms.CharField(required=False)
     hospitalization = forms.DateField(required=False)
     hospitalDischarge = forms.DateField(required=False, initial=date.today())
