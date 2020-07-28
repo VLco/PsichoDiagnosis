@@ -20,7 +20,7 @@
                     <h4 class="card-title">{{ patient.FIO }}</h4>
                     <p class="card-text text-dark mx-2 border-bottom pl-1">Number Card: {{ patient.NumberRecord }}</p>
                     <p class="card-text text-dark mx-2 border-bottom pl-1">Birthday: {{ patient.Birthday }}</p>
-                    <p class="card-text text-dark mx-2 border-bottom pl-1">Sex: {{ patient.Sex }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Sex: {{ patient.get_Sex_display }}</p>
                     <p class="card-text text-dark mx-2 border-bottom pl-1">Adress: {{ patient.Adress }}</p>
                     <p class="card-text text-dark mx-2 border-bottom pl-1">Phone: {{ patient.Phone }}</p>
 
