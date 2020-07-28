@@ -187,7 +187,7 @@
 
 
                         $('.add-sym')[0].reset();
-                        $('#id_idForm').val("{{login}}");
+                        $("#id_idForm").val("{{form.id}}");
                         document.getElementById("select2-id_idSym-container").textContent="---------";
                         document.getElementById("select2-id_idConv-container").textContent="---------";
                      }
@@ -236,7 +236,7 @@
 
                         $('#add_symptom').modal('hide');
                         $('.add-form').trigger('reset');
-                        $('#id_uqidForm').val("{{login}}");
+                        $('#id_uqidForm').val("{{form.id}}");
                         document.getElementById("select2-id_uqidSym-container").textContent="---------";
                         document.getElementById("select2-id_uqidConv-container").textContent="---------";
                     }

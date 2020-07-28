@@ -1289,26 +1289,28 @@ def view_treatment(request, id_p, login, id_tr):
             anamesis.save()
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
 
-        if formEp.is_valid() and "epicrisis" in request.POST:
-            if Epicrisis.objects.filter(Treatment=treatment).exists():
-                epicrisis = Epicrisis.objects.get(Treatment=treatment)
-            else:
-                epicrisis = Epicrisis(Treatment=treatment)
-            epicrisis.Referral = request.POST.get('referral')
-            epicrisis.Therapy = request.POST.get('therapy')
-            epicrisis.IsOver = 1 if request.POST.get('is_over') else 0
-            epicrisis.Disability = request.POST.get('disability')
-            if request.POST.get('hospitalization', False):
-                epicrisis.Hospitalization = request.POST.get('hospitalization')
-            else:
-                epicrisis.Hospitalization = treatment.Date
-            
-            epicrisis.HospitalDischarge =request.POST.get('hospitalDischarge')
-
+        if formEp.is_valid():
             try:
+                if Epicrisis.objects.filter(Treatment=treatment).exists():
+                    epicrisis = Epicrisis.objects.get(Treatment=treatment)
+                else:
+                    epicrisis = Epicrisis(Treatment=treatment)
+                epicrisis.Referral = request.POST.get('referral')
+                epicrisis.Therapy = request.POST.get('therapy')
+                epicrisis.IsOver = 1 if request.POST.get('is_over') else 0
+                epicrisis.Disability = request.POST.get('disability')
+                if request.POST.get('hospitalization', False):
+                    epicrisis.Hospitalization = request.POST.get('hospitalization')
+                else:
+                    epicrisis.Hospitalization = treatment.Date
+            
+                epicrisis.HospitalDischarge =request.POST.get('hospitalDischarge')
+
                 epicrisis.save()
             except ValidationError:
-                epicrisis.Referral = request.POST.get('referral')
+                value=0
+            except IntegrityError:
+                value=0
 
             template = "core/view_treatment.html"
             return HttpResponseRedirect(reverse("view_treatment", args=[patient.id, user.login, treatment.id]))
@@ -1359,10 +1361,13 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
                 f.Note = request.POST.get('note')
                 if f.DateForm is request.POST.get('dateForm', False):
                     f.DateForm = request.POST.get('dateForm')
-                f.save()
-                return HttpResponseRedirect(
-                    reverse("view_form", args=[patient.id, user.login, treatment.id, diag.id, f.id]))
-
+                try:
+                    f.save()
+                except ValidationError:
+                    return HttpResponseRedirect(reverse("view_diagnosis", args=[patient.id, user.login, treatment.id, diag.id]))
+                return HttpResponseRedirect(reverse("view_form", args=[patient.id, user.login, treatment.id, diag.id, f.id]))
+        return HttpResponseRedirect(reverse("view_diagnosis", args=[patient.id, user.login, treatment.id, diag.id]))
+        
     context = {
         'login': login,
         'patient': patient,
