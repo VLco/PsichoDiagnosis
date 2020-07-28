@@ -81,8 +81,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',#postgresql_psycopg2',
         'NAME': 'psyscan',
-        'USER': 'postgres',
-        'PASSWORD': '123',
+        'USER': 'psyscan',
+        'PASSWORD': 'mypass',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
