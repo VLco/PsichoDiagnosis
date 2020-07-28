@@ -164,33 +164,37 @@
             }
 
         });
+
         // Удаление элемента из таблицы
         $(document).delegate('.delete', 'click', function() {
-            var idelem = $(this).data('id');
-            var id = $(this).data('id');
-            var row = $(this).closest("tr").get(0);
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                var idelem = $(this).data('id');
+                var id = $(this).data('id');
+                var row = $(this).closest("tr").get(0);
 
-            url = "{% url 'delete_patient_records' %}";
-            table_name = "#patient_table";
+                url = "{% url 'delete_patient_records' %}";
+                table_name = "#patient_table";
 
-            var oTable = $(table_name).dataTable();
-            rowid = oTable.fnGetPosition(row);
+                var oTable = $(table_name).dataTable();
+                rowid = oTable.fnGetPosition(row);
 
-            if (url != "") {
-                $.post(url, {
-                    id: id,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                }, function(data) {
-                    if (data == "0") {
-                        var oTable = $(table_name).dataTable();
-                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                if (url != "") {
+                    $.post(url, {
+                        id: id,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    }, function(data) {
+                        if (data == "0") {
+                            var oTable = $(table_name).dataTable();
+                            oTable.fnDeleteRow(oTable.fnGetPosition(row));
 
-                    } else {
-                        alert("Line not deleted");
-                    }
-                });
-            } else {
-                alert("Error: url not correct");
+                        } else {
+                            alert("Line not deleted");
+                        }
+                    });
+                } else {
+                    alert("Error: url not correct");
+                }
             }
         });
 
