@@ -207,6 +207,7 @@ class PatientsForm(forms.Form):
     phone.widget.attrs.update({'class': 'form-control'})
 
 class UserForm(forms.Form):
+    login = forms.CharField(required='', max_length=50, label="")
     FIO = forms.CharField(required='', max_length=50, label="FIO")
     email = forms.CharField(required='', max_length=100, label="email")
     password = forms.CharField(required='', max_length=100, label="password")

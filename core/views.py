@@ -25,7 +25,6 @@ from .forms import *
 # Create your views here.
 
 g_login = ''
-g_id = ''
 # ok
 def base_core(request):
     signin_form = SigninForm()
@@ -37,26 +36,31 @@ def base_core(request):
 def sign_in(request):
     if request.method == "POST":
         user = Doctor()
+        if user.Activated == True:
+            fields = {
+                'login': request.POST.get("login"),
+                'password': request.POST.get("password"),
+            }
 
-        fields = {
-            'login': request.POST.get("login"),
-            'password': request.POST.get("password"),
-        }
-
-        if Doctor.objects.all().filter(login=fields['login']):
-            user.login = fields['login']
-            user.password = fields['password']
-            template = 'core/main.html'
-            return render(request, template, {"login": user.login})
+            if Doctor.objects.all().filter(login=fields['login']):
+                user.login = fields['login']
+                user.password = fields['password']
+                template = 'core/main.html'
+                return render(request, template, {"login": user.login})
+            else:
+                signin_form = SigninForm()
+                template = "core/base_core.html"
+                return render(request, template, {"form": signin_form, "message": "Данные введены не корректно"})
+            
         else:
             signin_form = SigninForm()
-            template = "core/base_core.html"
-            return render(request, template, {"form": signin_form, "message": "Данные введены не корректно"})
-            
+            template = "core/sign_in.html"
+            return render(request, template, {"form": signin_form, "message": "Аккаунт не активирован"})
     else:
         signin_form = SigninForm()
-        template = "core/sign_in.html"
+        template = "core/base_core.html"
         return render(request, template, {"form": signin_form})
+        
 
 
 
@@ -85,7 +89,7 @@ def register(request):
         else:
             user.login = fields['login']
             user.password = fields['password']
-            user.isAdmin = False
+            user.Activated = False
             user.save()
             return HttpResponseRedirect('/sign-in/')
     else:
@@ -105,11 +109,13 @@ def main(request):
             'password': request.POST.get("password"),
         }
 
-        if Doctor.objects.all().filter(login=fields['login'], password=fields['password']):
+        if Doctor.objects.all().filter(login=fields['login'], password=fields['password'],Activated = False):
+            signin_form = SigninForm()
+            template = "core/base_core.html"
+            return render(request, template, {"form": signin_form, "message": "Account not activated"})
+        if Doctor.objects.all().filter(login=fields['login'], password=fields['password'], Activated = True):
             template = 'core/main.html'
             return HttpResponseRedirect(reverse("patient_records", args=[fields['login']]))
-            #return render(request, template, {"login": fields["login"]})
-
         else:
             signin_form = SigninForm()
             template = "core/base_core.html"
@@ -1324,48 +1330,50 @@ def view_diagnosis(request, id_p, login, id_tr, id_d):
     return render(request, template, context)
     pass
 
-
+#####
+#Персона
 def personal_cabinet(request, login):
-    if not request.method == "POST":
-        global g_login
-        g_login = login
-        formUser = UserForm()
-        user = Doctor.objects.get(login = g_login)
+    global g_login
+    g_login = login
+    formUser = UserForm()
+    user = Doctor.objects.get(login = g_login)
+    context = {
+        'login':login,
+        'formUser':formUser,
+        'user': user
+    }
+    template = "core/personal_cabinet.html"
+    
+    return render(request, template, context)
 
-        context = {
-            'login':login,
-            'formUser':formUser,
-            'user': user
-        }
-        template = "core/personal_cabinet.html"
-        return render(request, template, context)
-
+def get_person(request):
+    error=-1
     if request.method == "POST":
-        formUser = UserForm()
-        user = Doctor.objects.get(login = login)
-        user.FIO = request.POST.get("FIO")
-        user.email = request.POST.get("email")
-        user.password = request.POST.get("password")
-        user.SocialNetwork = request.POST.get("social_networks")
-        user.Position = request.POST.get("position")
-        user.Department = request.POST.get("department")
-        user.save()
+        login = request.POST.get("login")
+        if Doctor.objects.all().filter(login = login):
+            user = Doctor.objects.get(login = login)
+            return HttpResponse(json.dumps({'id': user.id, 'FIO':user.FIO, 'email':user.email, 'password':user.password, 'social_network':user.SocialNetwork, 'position':user.Position, 'department':user.Department}), content_type="application/json")
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
-        formUser.fields['FIO'].initial = user.FIO
-        formUser.fields['email'].initial = user.email
-        formUser.fields['password'].initial = user.password
-        formUser.fields['social_networks'].initial = user.SocialNetwork
-        formUser.fields['position'].initial = user.Position
-        formUser.fields['department'].initial = user.Department
 
-        template = "core/personal_cabinet.html"
-        context = {
-            'login': login,
-            'form': formUser,
-            'user': user
-            }
-        return render(request, template, context)
 
+def update_person(request):
+    error=-1
+    if request.method == "POST":
+        login = request.POST.get("login")
+        if Doctor.objects.all().filter(login = login):
+            user = Doctor.objects.get(login = login)
+            user.FIO = request.POST.get("FIO")
+            user.email = request.POST.get("email")
+            user.password = request.POST.get("password")
+            user.SocialNetwork = request.POST.get("social_networks")
+            user.Position = request.POST.get("position")
+            user.Department = request.POST.get("department")
+            user.save()
+            return HttpResponse(json.dumps({'id': user.id, 'FIO':user.FIO, 'email':user.email, 'password':user.password, 'social_network':user.SocialNetwork, 'position':user.Position, 'department':user.Department}), content_type="application/json")
+        else:
+            error=-2
+    return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def add_syndrom(request):
     error=-1
@@ -1419,13 +1427,17 @@ def add_symrule(request):
         idRul= request.POST.get("idSRuleRule")
         idSym = request.POST.get("idSymRule")
         idConv = request.POST.get("idConvRule")
-        ruleSymptom = RuleSymptom()
-        ruleSymptom.Rule = Rule.objects.get(id=idRul)
-        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
-        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
-        ruleSymptom.save()
-        error=ruleSymptom.id
-        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        if not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
+            ruleSymptom = RuleSymptom()
+            ruleSymptom.Rule = Rule.objects.get(id=idRul)
+            ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+            ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+            ruleSymptom.save()
+            error=ruleSymptom.id
+            return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        else:
+            error=-2
+
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def get_symrule(request):
@@ -1444,13 +1456,16 @@ def update_symrule(request):
         idRul= request.POST.get("idSRuleRule")
         idSym = request.POST.get("idSymRule")
         idConv = request.POST.get("idConvRule")
-        ruleSymptom = RuleSymptom.objects.get(id=id)
-        ruleSymptom.Rule = Rule.objects.get(id=idRul)
-        ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
-        ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
-        ruleSymptom.save()
-        error=ruleSymptom.id
-        return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        if not RuleSymptom.objects.all().filter(Symptom=idSym, Rule=idRul):
+            ruleSymptom = RuleSymptom.objects.get(id=id)
+            ruleSymptom.Rule = Rule.objects.get(id=idRul)
+            ruleSymptom.Symptom=Symptom.objects.get(id=idSym)
+            ruleSymptom.Conviction=Conviction.objects.get(id=idConv)
+            ruleSymptom.save()
+            error=ruleSymptom.id
+            return HttpResponse(json.dumps({'id': error, 'sym':ruleSymptom.Symptom.Name, 'conv':ruleSymptom.Conviction.Name}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def update_syndrom(request):
@@ -1493,15 +1508,17 @@ def add_questdoc(request):
         logDoc= request.POST.get("logDoc")
         idDoc = Doctor.objects.get(login=logDoc).id
         note= request.POST.get("note")
-
-        selectDoctor = SelectedSymptomsDoctor()
-        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
-        selectDoctor.Symptom=Symptom.objects.get(id=idSym)
-        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
-        selectDoctor.Note=note
-        selectDoctor.save()
-        error=selectDoctor.id
-        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        if not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
+            selectDoctor = SelectedSymptomsDoctor()
+            selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+            selectDoctor.Symptom=Symptom.objects.get(id=idSym)
+            selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+            selectDoctor.Note=note
+            selectDoctor.save()
+            error=selectDoctor.id
+            return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
 def delete_questdoc(request):
@@ -1510,6 +1527,16 @@ def delete_questdoc(request):
         id = request.POST.get("id")
         if SelectedSymptomsDoctor.objects.all().filter(id=id):
             SelectedSymptomsDoctor.objects.all().filter(id=id).delete()
+            error=0
+    return HttpResponse(error)
+
+
+def deleteall_questdoc(request):
+    error=1
+    if request.method == "POST":
+        login = request.POST.get("login")
+        if SelectedSymptomsDoctor.objects.all().filter(Doctor=Doctor.objects.get(login=login).id):
+            SelectedSymptomsDoctor.objects.all().filter(Doctor=Doctor.objects.get(login=login).id).delete()
             error=0
     return HttpResponse(error)
 
@@ -1532,30 +1559,26 @@ def update_questdoc(request):
         logDoc= request.POST.get("uqlogDoc")
         idDoc = Doctor.objects.all().get(login=logDoc).id
         note= request.POST.get("uqnote")
-
-        selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
-        selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
-        selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
-        selectDoctor.Conviction=Conviction.objects.get(id=idConv)
-        selectDoctor.Note=note
-        selectDoctor.save()
-        error=selectDoctor.id
-        return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        if not SelectedSymptomsDoctor.objects.all().filter(Symptom=idSym, Doctor=idDoc):
+            selectDoctor = SelectedSymptomsDoctor.objects.get(id=id)
+            selectDoctor.Doctor = Doctor.objects.get(id=idDoc)
+            selectDoctor.Symptom=Symptom.objects.all().get(id=idSym)
+            selectDoctor.Conviction=Conviction.objects.get(id=idConv)
+            selectDoctor.Note=note
+            selectDoctor.save()
+            error=selectDoctor.id
+            return HttpResponse(json.dumps({'id': error, 'sym':selectDoctor.Symptom.Name, 'conv':selectDoctor.Conviction.Name, 'note':selectDoctor.Note}), content_type="application/json")
+        else:
+            error=-2
     return HttpResponse(json.dumps({'id': error}), content_type="application/json")
 
-def verity_cond(sim, rul):
-    if sim==rul:
-        return 1
-    elif sim+1==rul or sim-1==rul:
-        return 0.6
-    else:
-        return 0
+
 
 def alg_mamdani_up(request):
     login = request.POST.get("login")
     idDoc = Doctor.objects.get(login=login).id
     selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
-    diag_id = alg_mamdani(selectsDoctor)
+    diag_id, conv_id = alg_mamdani(selectsDoctor)
 
     if diag_id == -1:
         # Диагноз не найден
@@ -1563,16 +1586,33 @@ def alg_mamdani_up(request):
     else:
         # Выдаем диагноз
         diag = Diagnos.objects.get(id=diag_id)
-        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name}), content_type="application/json")
+        return HttpResponse(json.dumps({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name}), content_type="application/json")
 
     # selectDoctor.Symptom
     # selectDoctor.Conviction
 
 
+def verity_conv(sim, rul):
+    if sim==rul:
+        return 1
+    elif sim+1==rul or sim-1==rul:
+        return 0.6
+    else:
+        return 0
+
+def getid_conv(ver):
+    if ver<=0.33:
+        return 1
+    elif ver<=0.66:
+        return 2
+    else:
+        return 3
+
 def alg_mamdani(selectsDoctor):
 
     ver_max=0
     id_max=[]
+    ver_idmax=[]
 
     #Пробегаем по всем правилам
     for rule in Rule.objects.all():
@@ -1588,7 +1628,7 @@ def alg_mamdani(selectsDoctor):
                 if selectDoctor.Symptom.id==rsymti.Symptom.id:
                     include = True
                     includeAll = True
-                    verity_rule.append(verity_cond(selectDoctor.Conviction.Position, rsymti.Conviction.Position))
+                    verity_rule.append(verity_conv(selectDoctor.Conviction.Position, rsymti.Conviction.Position))
             if not include:
                 verity_rule.append(0)
 
@@ -1615,21 +1655,27 @@ def alg_mamdani(selectsDoctor):
             if fin_ver>ver_max:
                 ver_max=fin_ver
                 id_max=[]
+                ver_idmax=[]
                 id_max.append(rule.Diagnos.id)
+                ver_idmax.append(mean_ver)
             elif fin_ver == ver_max:
                 id_max.append(rule.Diagnos.id)
+                ver_idmax.append(mean_ver)
 
     if len(id_max)==0:
         # Диагноз не найден
-        return -1
+        return -1, -1
     elif len(id_max)>1:
         # Выбираем один из
-        diag = Diagnos.objects.get(id_max[random.randint(0, len(id_max)-1)])
-        return diag.id
+        ind = random.randint(0, len(id_max)-1)
+        diag = Diagnos.objects.get(id=id_max[ind])
+        conv =  Conviction.objects.get(Position = getid_conv(ver_idmax[ind]))
+        return diag.id, conv.id
     else:
         # Выдаем диагноз
         diag = Diagnos.objects.get(id=id_max[0])
-        return diag.id
+        conv =  Conviction.objects.get(Position = getid_conv(ver_idmax[0]))
+        return diag.id, conv.id
 
 
 
@@ -2269,3 +2315,33 @@ class SingleAnamesisView(APIView):
         anamesis = get_object_or_404(Anamesis.objects.all(), pk=pk)
         serializer = GetAnamesisSerializer(anamesis)
         return Response({"Anamesis": serializer.data})
+
+#####
+class MamdaniDocView(APIView):
+    def get(self, request, login):
+        idDoc = get_object_or_404(Doctor.objects.all(), login=login).id
+        selectsDoctor = SelectedSymptomsDoctor.objects.filter(Doctor=idDoc)
+        diag_id, conv_id = alg_mamdani(selectsDoctor)
+
+        if diag_id == -1:
+            # Диагноз не найден
+            return HttpResponse({'id': -1})
+        else:
+            # Выдаем диагноз
+            diag = Diagnos.objects.get(id=diag_id)
+            return Response({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name})
+
+class MamdaniFormView(APIView):
+    def get(self, request, pk):
+        selectsDoctor = SelectedSymptoms.objects.filter(Form=pk)
+        diag_id, conv_id = alg_mamdani(selectsDoctor)
+
+        if diag_id == -1:
+            # Диагноз не найден
+            return Response({'id': -1})
+        else:
+            # Выдаем диагноз
+            diag = Diagnos.objects.get(id=diag_id)
+            return Response({'id': diag.id, 'name':diag.Name, 'idconv':conv_id, 'nameconv': Conviction.objects.get(id=conv_id).Name})
+
+

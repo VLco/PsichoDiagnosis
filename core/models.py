@@ -25,6 +25,7 @@ class Doctor(models.Model):
     email = models.CharField(max_length=200, verbose_name='email')
     password = models.CharField(max_length=50, verbose_name='password')
     FIO = models.CharField(max_length=50, verbose_name='last first middle name', default="")
+    Activated = models.BooleanField(default=False)
     SocialNetwork = models.CharField(max_length=50, verbose_name='SocialNetwork', default="")
     Position = models.CharField(max_length=50, verbose_name='position', default=" ")
     Department = models.CharField(max_length=50, verbose_name='department', default="")
@@ -119,7 +120,7 @@ class Form(models.Model):
     Name = models.CharField(max_length=1000, verbose_name='name')
     DateForm = models.DateField(default=date.today(), null=True)
     Note = models.CharField(max_length=50000, verbose_name='note')
-    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE)
+    Conviction = models.ForeignKey(Conviction, on_delete=models.CASCADE, null=True)
 
     class Meta():
         verbose_name = 'form'

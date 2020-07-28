@@ -55,6 +55,9 @@ urlpatterns = [
     path('patient_records/view/<id>/<login>/del=<int:id_entry>', views.delete_treatment, name="delete_treatment"),
 
     path("<login>-personal_cabinet/", views.personal_cabinet, name="personal_cabinet"),
+    path("person/get", views.get_person, name="get_person"),
+    path("person/update", views.update_person, name="update_person"),
+
 
     path('patient_records/view/<int:id>/<login>', views.view_patient_records, name="view_patient_records"),
     path('patient_records/view/<int:id_p>/<login>/treatment-<int:id_tr>', views.view_treatment, name="view_treatment"),
@@ -68,6 +71,7 @@ urlpatterns = [
     path('questionary/doc-<login>/', views.questionary, name="questionary"),
     path('questdoc/add/', views.add_questdoc, name="add_questdoc"),
     path('questdoc/delete/', views.delete_questdoc, name="delete_questdoc"),
+    path('questdoc/deleteall/', views.deleteall_questdoc, name="deleteall_questdoc"),
     path('questdoc/get/', views.get_questdoc, name="get_questdoc"),
     path('questdoc/update/', views.update_questdoc, name="update_questdoc"),
 
@@ -129,4 +133,7 @@ urlpatterns = [
     path('api/anamesis/', AnamesisView.as_view()),
     path('api/anamesis/<int:pk>', AnamesisView.as_view()),
     path('api/single-anamesis/<int:pk>', SingleAnamesisView.as_view()),
+
+    path('api/mamdani/doc-<login>', MamdaniDocView.as_view()),
+    path('api/mamdani/form-<int:pk>', MamdaniFormView.as_view()),
 ]

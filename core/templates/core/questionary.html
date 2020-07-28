@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-
+{% block title %}Questionary{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-center mt-3">
@@ -11,10 +11,10 @@
 </div>
 
 
-<div class="card container bg-white mt-3 p-3 box-shadow">
+<div class="card container bg-white mt-3 p-3 ">
     <div>
         <div class="container border-bottom mb-4 ">
-            <form class="pb-3 add-sym" method="POST">
+            <form class="container pb-3 add-sym" method="POST">
                 {% csrf_token %}
                 {{ DocForm }}
                 <div class="d-flex flex-row-reverse mt-3">
@@ -26,7 +26,18 @@
         
         <table id="symptom_table" class="table table-striped table-bordered " cellspacing="0" style="width:100%">
             <thead>
-                <a id="symptom_btn" href="#"  class="btn btn-primary btn-xs pull-left">Get Diagnos</a>
+                <div class="d-flex justify-content-between mt-3">
+                    <div class="row mt-1 ml-1 ">
+                        <h5 id="diagnos_get" class="text-primary jumbotron-heading"></h5>
+                        <h5 id="conviction_get" class="ml-2 text-primary jumbotron-heading"></h5>
+                    </div>
+                    <div>
+                        <a id="del_symptom_btn" href="#"  class="btn btn-danger btn-xs pull-left mr-3">Remove All</a>
+                        <a id="symptom_btn" href="#"  class="btn btn-primary btn-xs pull-left">Get Diagnos</a>
+                    </div>
+                    
+                </div>
+
                 <tr>
                     <th>Symptom</th>
                     <th>Conviction</th>
@@ -154,7 +165,9 @@
                     $.post(url_add, datain, function(data) {
                     if(data.id == "-1"){
                         alert("Line not added");
-                    }else {
+                    }else if(data.id == "-2"){
+                        alert("Line not added, symptom exists");
+                    } else {
                         var rData = [
                             data.sym,
                             data.conv,
@@ -201,7 +214,9 @@
                     $.post(url_update, datain, function(data) {
                     if(data.id == "-1"){
                         alert("The line is not changed");
-                    } else {;
+                    }else if(data.id == "-2"){
+                        alert("Line not changed, symptom exists");
+                    } else {
                         var rData = [
                             data.sym,
                             data.conv,
@@ -216,7 +231,7 @@
                             '</div>'
                         ];
                         $(table_name).DataTable().row(rowid).data(rData).draw();
-
+                        
                         $('#add_symptom').modal('hide');
                         $('.add-form').trigger('reset');
                         $('#id_uqlogDoc').val("{{login}}");
@@ -238,16 +253,38 @@
             login="{{login}}";
             url="{% url 'alg_mamdani_up' %}"
             $.post(url, {login:login, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
-                alert("Diagnos: " + data.name);
-                // if(data == "0"){
-                //     var oTable = $(table_name).dataTable();
-                //     oTable.fnDeleteRow(oTable.fnGetPosition(row));
-                // }
-                // else {
-                //     alert("Строка не удалена");
-                // }
+                if(data.id != -1){
+                    document.getElementById('diagnos_get').textContent="Diagnosis: " + data.name;
+                    document.getElementById('conviction_get').textContent="Conviction: "+ data.nameconv;
+                } else{
+                    document.getElementById('diagnos_get').textContent="Diagnosis: Not found";
+                    document.getElementById('conviction_get').textContent="Conviction: Not found";
+                }
+
             }); 
         });
+
+        //Удаление всех симптомов
+        $(document).delegate('#del_symptom_btn', 'click', function() {
+            login="{{login}}";
+            url="{% url 'deleteall_questdoc' %}"
+            var isOK = confirm("Are you sure?");
+            if(isOK){
+                $.post(url, {login:login, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
+                    if(data == "0"){
+                        table_name= "#symptom_table";
+                        document.getElementById('diagnos_get').textContent="";
+                        document.getElementById('conviction_get').textContent="";
+                        var oTable = $(table_name).dataTable();
+                        oTable.fnDeleteRow();
+                    } else{
+                        alert("Line not deleted");
+                    }
+                }); 
+            }
+        });
+
+        
 
         // Удаление элемента из таблицы
         $(document).delegate('.delete', 'click', function() { 
@@ -264,7 +301,7 @@
                     $.post(url, {id:id, 'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(data) {
                         if(data == "0"){
                             var oTable = $(table_name).dataTable();
-                        oTable.fnDeleteRow(oTable.fnGetPosition(row));
+                            oTable.fnDeleteRow(oTable.fnGetPosition(row));
                         }
                         else {
                             alert("Line not deleted");
