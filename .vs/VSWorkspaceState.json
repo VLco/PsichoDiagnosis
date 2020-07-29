@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\core",
+    "\\core\\migrations",
+    "\\core\\static",
+    "\\core\\templates",
+    "\\core\\templates\\core",
+    "\\iswork",
+    "\\templates"
+  ],
+  "SelectedNode": "\\iswork\\settings.py",
+  "PreviewInSolutionExplorer": false
+}

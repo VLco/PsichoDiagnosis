@@ -1,0 +1,176 @@
+{% extends 'core/base.html' %}
+{% block title %}Diagnosis view{% endblock %}
+{% block content %}
+<a type="button" rel="tooltip" href="{% url 'view_treatment' patient.id login treatment.id%}" class="ml-3 mt-2 h5 text-white" data-original-title="" title="">&#8592; back (Treatment)</a>
+
+    <div class="d-flex justify-content-center mt-3">
+        <div class="col-md-7 mb-1 mt-1 text-white text-center ">
+            <div class="container">
+                <h1 class="jumbotron-heading">Diagnosis</h1>
+                <p class="lead">You login as {{ user.login }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-3">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="border-bottom pb-4">
+                    <h4 class="card-title">{{ diagnosis.Name }}</h4>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Doctor: {{ diagnosis.Doctor }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Note: {{ diagnosis.Note }}</p>
+                    <p class="card-text text-dark mx-2 border-bottom pl-1">Date: {{ diagnosis.StartDiagnosis }}</p>
+                </div>
+
+                <div class="tab-content">
+                    <div id="form" class="tab-pane fade show active " role="tabpanel">
+                        <table id="form_table" class="table table-striped table-bordered " cellspacing="0"
+                               style="width:100%">
+                            <thead>
+                            <tr>
+                                <a id="form_btn" href="" data-toggle="modal" data-target="#add_form"
+                                   class="btn btn-primary btn-xs pull-left add-elem">Add new form</a>
+                                <th>Name</th>
+                                <th>Date form</th>
+                                <th>Note</th>
+                                <th>Diagnos</th>
+                                <th>Conviction</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for form in listForm %}
+                                <tr>
+                                    <td>{{ form.Name }}</td>
+                                    <td>{{ form.DateForm }}</td>
+                                    <td>{{ form.Note }}</td>
+                                    <td>{{ form.Diagnos }}</td>
+                                    <td>{{ form.Conviction }}</td>
+
+                                    <td class="td-actions text-right">
+                                        <a class="btn btn-danger btn-just-icon btn-sm delete mr-2"
+                                            href="{% url 'delete_form' login form.id %}">
+                                            <i class="material-icons">close</i>
+                                        </a>
+                                        <a class="btn btn-info btn-just-icon btn-sm update"
+                                            href="{% url 'view_form' patient.id user.login treatment.id diagnosis.id form.id %}">
+                                            <i class="material-icons">edit</i>
+                                        </a>
+
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <form id="form_add" class="add-form" data-db="records" method="POST">
+        <div id="add_form" class="modal" tabindex="0" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create form</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %} {{ formForm }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+        $('#form_table').DataTable({
+            "aLengthMenu": [
+                [5, 10, 25, -1],
+                [5, 10, 25, "All"]
+            ]
+        });
+
+
+    </script>
+    <style>
+        body.modal-open {
+            overflow: auto;
+        }
+
+        body.modal-open[style] {
+            padding-right: 0px !important;
+        }
+
+        .modal::-webkit-scrollbar {
+            width: 0 !important;
+            /*removes the scrollbar but still scrollable*/
+            /* reference: http://stackoverflow.com/a/26500272/2259400 */
+        }
+
+        table {
+            width: 100%;
+        }
+
+        #form_table_filter {
+            float: right;
+        }
+
+        #form_table_paginate {
+            float: right;
+        }
+
+        #form_table_length {
+            float: left;
+        }
+
+        #form_table_length label {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        #form_table_length select {
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        #form_table_filter label {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        #form_table_filter input {
+            margin-left: 10px;
+        }
+
+        .add-elem {
+            margin-top: 10px;
+        }
+
+        .back-to-top {
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+    </style>
+{% endblock %}

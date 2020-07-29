@@ -1,0 +1,37 @@
+{% extends 'core/main.html' %}
+
+
+{% block title %}Data on admission{% endblock %}
+
+
+
+
+{% block content %}
+<form action="{% url 'chose_method_work_patient' login=login%}" method="post">
+    {% csrf_token %}
+
+
+    <div class="col-md-4 offset-md-4">
+        <div class="row justify-content-center">
+            <div class="col-3 text-center" style="background-color: white; box-shadow: 0 0 10px; position: fixed; top: 25%">
+                <p class="mt-3" style="font-size: 1.1em">
+                    Work with patient
+                </p>
+                <div class="btn-group-vertical">
+                    <div class="mt-3 form-group row">
+                        <label for="" class="col-sm-2 col-form-label" style="text-align: left;">Patient Card Number</label>
+                        <div class="col-sm-10">
+                            {{ form.number_card }}
+                        </div>
+                    </div>
+                    <button type="submit" class="mb-3 btn btn-primary" name='opros_btn'>Start a survey in the questionnaire</button>
+                    <button type="submit" class="mb-3 btn btn-primary" name='epicriz_btn'>Epicrisis of the patient</button>
+                    <button type="submit" class="mb-3 btn btn-primary" name='diagnoz_btn'>Patient diagnoses</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</tr>
+
+{% endblock %}
+

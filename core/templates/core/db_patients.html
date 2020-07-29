@@ -1,0 +1,124 @@
+﻿{% extends 'core/main.html' %}
+
+
+{% block title %}Patient Database{% endblock %}
+
+
+
+{% block content %}
+
+
+<form action="{% url 'job_with_db_patients' %}" method="POST">
+
+    {% csrf_token %}
+
+    <div class="col-md-4 offset-md-2" style="position: absolute; top: 15%;">
+        <div class="row justify-content-center">
+            <button type="submit" class="btn fa fa-2x fa-user-plus" name="_add" style="box-shadow: none"></button>
+            <button type="submit" class="btn fa fa-2x fa-user-times" name="_delete" style="box-shadow: none"></button>
+            <!-- <button type="submit" class="btn fa fa-2x fa-save" name="_change" style="box-shadow: none"></button> -->
+        </div>
+    </div>
+
+
+
+    <!--<div class="col-md-4 offset-md-2" style="top: 15%;">
+        <div class="row justify-content-center">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn fa fa-2x fa-user-plus" style="box-shadow: none"></button>
+                <button type="button" class="btn fa fa-2x fa-user-times" style="box-shadow: none"></button>
+                <button type="button" class="btn fa fa-2x fa-save" style="box-shadow: none"></button>
+            </div>
+        </div>
+    </div>-->
+
+
+
+    <div class="col-sm-12" style="position: absolute; top: 25%">
+        <div class="row justify-content-center">
+            <div class="col-7 text-center" style="background-color: white; box-shadow: 0 0 10px;">
+                <div class="mt-3 form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left;">Number card</label>
+                    <div class="col-sm-10">
+                        {{ form.number_card }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left;">First name, last name and middle name</label>
+                    <div class="col-sm-10">
+                        {{ form.FIO }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Birthday</label>
+                    <div class="col-sm-10">
+                        {{ form.date_birth }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Sex</label>
+                    <div class="col-sm-10">
+                        {{ form.sex }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Address</label>
+                    <div class="col-sm-10">
+                        {{ form.address }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="" class="col-sm-2 col-form-label" style="text-align: left">Phone</label>
+                    <div class="col-sm-10">
+                        {{ form.phone }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4 col-sm-12" style="position: absolute; top: 105%">
+            <div class="row justify-content-center">
+                <div class="col-11 text-center" style="background-color: white; box-shadow: 0 0 10px;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Number card</th>
+                                <th scope="col">First name, last name and middle name</th>
+                                <th scope="col">Birthday</th>
+                                <th scope="col">Sex</th>
+                                <th scope="col">Address</th>
+                                <th scope="col">Phone</th>
+        
+                            </tr>
+                        </thead>
+        
+        
+                        <tbody>
+        
+                            {% for patient in patients %}
+        
+                            <tr>
+                                <td>{{ patient.NumberRecord }}</td>
+                                <td>{{ patient.FIO }}</td>
+                                <td>{{ patient.Birthday }}</td>
+                                <td>{{ patient.Sex }}</td>
+                                <td>{{ patient.Adress }}</td>
+                                <td>{{ patient.Phone }}</td>
+                            </tr>
+        
+                            {% endfor %}
+        
+                        </tbody>
+        
+        
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+
+
+    {% endblock %}
